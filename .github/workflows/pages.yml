@@ -4,9 +4,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # Nouvelle version de l'appli publiée : on met à jour version.json
-  release:
-    types: [published]
   schedule:
     # Chaque jour à 04:23 (heure de Paris en hiver) : horaires TaM du jour
     - cron: "23 3 * * *"

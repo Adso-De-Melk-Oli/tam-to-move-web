@@ -1,0 +1,15 @@
+name: Nouvelle version de l'appli
+# Une version publiée crée une étiquette (tag) : la page ne peut être publiée que depuis main,
+# on relance donc la publication sur main pour mettre à jour version.json.
+on:
+  release:
+    types: [published]
+permissions:
+  actions: write
+jobs:
+  relancer:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --repo ${{ github.repository }} --ref main
