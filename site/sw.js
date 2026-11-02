@@ -1,6 +1,6 @@
 // Hors ligne : l'interface et les horaires déjà consultés restent disponibles.
-const CACHE = "ttm-v2";
-const SHELL = ["./", "index.html", "style.css", "app.js", "engine.js", "config.js", "manifest.webmanifest", "icon-192.png", "vendor/qrcode.js",
+const CACHE = "ttm-v3";
+const SHELL = ["./", "index.html", "style.css?v=3", "app.js?v=3", "engine.js?v=3", "config.js?v=3", "manifest.webmanifest", "icon-192.png", "vendor/qrcode.js?v=3",
   "fonts/inter_regular.otf", "fonts/inter_medium.otf", "fonts/inter_semibold.otf", "fonts/inter_bold.otf"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); self.skipWaiting(); });
 self.addEventListener("activate", e => {
@@ -11,7 +11,7 @@ self.addEventListener("fetch", e => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin) return; // temps réel : jamais en cache
   // Réseau d'abord (données fraîches), cache en secours
-  e.respondWith(fetch(e.request).then(r => {
+  e.respondWith(fetch(e.request, { cache: "no-cache" }).then(r => {
     const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); return r;
   }).catch(() => caches.match(e.request)));
 });

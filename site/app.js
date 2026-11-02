@@ -1,6 +1,6 @@
 // Tam to Move – page web. Favoris sauvegardés dans le navigateur (localStorage), rien n'est envoyé ailleurs.
-import * as E from "./engine.js";
-import { RELAIS } from "./config.js";
+import * as E from "./engine.js?v=3";
+import { RELAIS } from "./config.js?v=3";
 
 const MAX = 10;
 const KEY = "ttm.favoris";
@@ -105,7 +105,7 @@ function status() {
 
 function viewHome() {
   const now = S.now;
-  let h = `<div class="nav"><span></span><a class="action" href="#/arrets">Modifier</a></div>
+  let h = `<div class="nav">${S.favoris.length ? `<a href="#/partage">Partager</a>` : "<span></span>"}<a class="action" href="#/arrets">Modifier</a></div>
     <h1>Tam to Move</h1><div class="sub">${status()}</div>`;
   for (const a of S.alerts) {
     h += `<button class="alert" onclick="this.classList.toggle('open')"><div class="i">!</div><div><b>${esc(a.title)}</b>${a.text ? `<p>${esc(a.text)}</p>` : ""}</div></button>`;
@@ -131,7 +131,7 @@ function viewHome() {
       ${body}${next}</a>`;
   }
   h += `<a class="card link" href="https://www.tam-voyages.com/fr" target="_blank" rel="noopener"><div><b>Site officiel TaM</b><span class="dest">tam-voyages.com · plans, tarifs, infos trafic</span></div><span style="color:var(--accent);font-size:20px">↗</span></a>
-    ${isAndroid ? `<a class="card link" href="${APK}"><div><b>Appli Android</b><span class="dest">widget, alertes « Pars maintenant » et dernier bus</span></div><span style="color:var(--accent);font-size:20px">↓</span></a>` : ""}
+    <a class="card link" href="${APK}"><div><b>Appli Android</b><span class="dest">${isAndroid ? "widget, alertes « Pars maintenant » et dernier bus" : "à télécharger depuis un téléphone Android"}</span></div><span style="color:var(--accent);font-size:20px">↓</span></a>
     <div class="foot">≈ heure approximative, d'après les horaires théoriques. Tes arrêts restent dans ce navigateur.</div>
     <div class="foot t">Données TaM · Montpellier Méditerranée Métropole · licence ODbL</div>`;
   return h;
