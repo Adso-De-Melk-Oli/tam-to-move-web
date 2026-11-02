@@ -13,8 +13,10 @@ const DEFAULTS = [
 
 const S = {
   favoris: load(), catalog: null, routes: {}, feed: null, rt: null, rtAt: null, alerts: [],
-  loading: true, now: Date.now() / 1000,
+  loading: true, now: Date.now() / 1000, vehicles: [],
 };
+const APK = "https://github.com/Adso-De-Melk-Oli/tam-to-move-web/releases/latest/download/Tam-to-Move.apk";
+const isAndroid = /Android/i.test(navigator.userAgent);
 
 function load() {
   try { const v = JSON.parse(localStorage.getItem(KEY)); if (Array.isArray(v)) return v; } catch (e) {}
@@ -53,10 +55,12 @@ async function loadRealtime() {
   if (!RELAIS) return;
   const now = Date.now() / 1000;
   try {
-    const [tu, al] = await Promise.all([
+    const [tu, al, ve] = await Promise.all([
       fetch(RELAIS + "/trip-updates").then(r => r.ok ? r.arrayBuffer() : Promise.reject()),
       fetch(RELAIS + "/alerts").then(r => r.ok ? r.arrayBuffer() : null).catch(() => null),
+      fetch(RELAIS + "/vehicles").then(r => r.ok ? r.arrayBuffer() : null).catch(() => null),
     ]);
+    if (ve) { try { S.vehicles = E.parseFeed(new Uint8Array(ve)).vehicles; } catch (e) {} }
     S.feed = E.parseFeed(new Uint8Array(tu));
     S.rt = E.predictions(S.routes, S.favoris, S.feed, now);
     S.rtAt = now;
@@ -127,6 +131,7 @@ function viewHome() {
       ${body}${next}</a>`;
   }
   h += `<a class="card link" href="https://www.tam-voyages.com/fr" target="_blank" rel="noopener"><div><b>Site officiel TaM</b><span class="dest">tam-voyages.com · plans, tarifs, infos trafic</span></div><span style="color:var(--accent);font-size:20px">↗</span></a>
+    ${isAndroid ? `<a class="card link" href="${APK}"><div><b>Appli Android</b><span class="dest">widget, alertes « Pars maintenant » et dernier bus</span></div><span style="color:var(--accent);font-size:20px">↓</span></a>` : ""}
     <div class="foot">≈ heure approximative, d'après les horaires théoriques. Tes arrêts restent dans ce navigateur.</div>
     <div class="foot t">Données TaM · Montpellier Méditerranée Métropole · licence ODbL</div>`;
   return h;
@@ -134,7 +139,7 @@ function viewHome() {
 
 function viewArrets() {
   const f = S.favoris;
-  let h = `<div class="nav"><a href="#/">‹ Accueil</a></div><h1>Mes arrêts</h1><div class="sub">${f.length}/${MAX} arrêts</div>`;
+  let h = `<div class="nav"><a href="#/">‹ Accueil</a>${f.length ? `<a class="action" href="#/partage">Partager</a>` : ""}</div><h1>Mes arrêts</h1><div class="sub">${f.length}/${MAX} arrêts</div>`;
   if (f.length) {
     h += `<div class="group">${f.map((q, i) => `<div class="item">
       <button class="round del" data-del="${i}" aria-label="Retirer">–</button>${pill(q, true)}
@@ -186,11 +191,11 @@ function viewSuivi(key) {
   const now = S.now, b = E.board(S.routes[f.routeId], live() ? S.rt : null, now, f);
   const ps = b.passages.filter(p => !p.canceled), first = ps[0];
   const l = ligne(f.routeId), d = l && l.directions.find(x => x.dir === f.dir);
-  const t = d ? E.track(f, d.stops, live() ? S.feed : null, b.passages, now) : null;
+  const t = d ? E.track(f, d.stops, live() ? S.feed : null, b.passages, now, 4, 5, 2, live() ? S.vehicles : []) : null;
   const tram = f.type === 0;
   let h = `<div class="nav"><a href="#/">‹ Accueil</a></div>
     <div class="row">${pill(f)}<h1 class="t2 ell">${short(f.stopName)}</h1></div>
-    <div class="sub"><span class="dot ${live() ? "live" : ""}" style="${live() ? "" : "background:var(--warn)"}"></span>→ ${short(f.headsign)} · ${live() ? `positions en direct · ${E.hour(S.rtAt)}` : "positions indisponibles"}</div>
+    <div class="sub"><span class="dot ${live() ? "live" : ""}" style="${live() ? "" : "background:var(--warn)"}"></span>→ ${short(f.headsign)} · ${live() ? `positions ${t && t.buses.some(b => b.gps) ? "GPS " : ""}en direct · ${E.hour(S.rtAt)}` : "positions indisponibles"}</div>
     <div class="card row" style="padding:14px 16px"><div class="grow">
       <div style="font-size:30px;font-weight:700;letter-spacing:-.7px" class="${first && first.realtime ? "" : "th"}">${first ? (first.realtime ? "" : "≈ ") + E.wait(first.time, now) : "—"}</div>
       ${first ? `<div class="dest">prochain ${tram ? "tram" : "bus"} · ${E.hourWithDay(first.time, now)}</div>` : ""}</div>
@@ -203,10 +208,47 @@ function viewSuivi(key) {
   }
   h += `<div class="track">${t.stops.map((s, i) => `<div class="tr ${i === 0 ? "first" : ""} ${i === t.stops.length - 1 ? "last" : ""} ${i === t.myIndex ? "me" : ""} ${i > t.myIndex ? "after" : ""}">
     <span class="rail"></span><span class="n ell">${nice(s.name)}</span>${i === t.myIndex ? `<span class="me-tag">TON ARRÊT</span>` : ""}</div>`).join("")}
-    ${t.buses.map(v => `<div class="bus ${v.estimated ? "est" : ""}" style="top:${Math.max(2, 6 + 54 * v.index - 15)}px"><span class="b" style="background:${lc}">${glyph(tram)}</span>
+    ${t.buses.map(v => `<div class="bus ${v.estimated ? "est" : ""}" style="top:${Math.max(2, 6 + 54 * (v.index - 1) + 27 + 54 * v.frac - 15)}px"><span class="b" style="background:${lc}">${glyph(tram)}${v.gps ? `<i class="gps"></i>` : ""}</span>
       <span class="eta ${v.realtime ? "" : "th"}">${v.realtime ? "" : "≈ "}${E.wait(v.eta, now)}</span></div>`).join("")}</div></div>
-    <div class="gfoot">${!t.buses.length && !t.far.length ? "Aucun passage prévu pour l'instant." : "Chaque pastille sur le tracé est un véhicule en route, avec son temps d'arrivée à ton arrêt. Pastille pâle : position estimée d'après l'horaire. « À venir » : pas encore sur ce tronçon. Mise à jour toutes les 30 s."}</div>`;
+    <div class="gfoot">${!t.buses.length && !t.far.length ? "Aucun passage prévu pour l'instant." : "Chaque pastille sur le tracé est un véhicule en route, avec son temps d'arrivée à ton arrêt. Point vert : position GPS réelle. Pastille pâle : position estimée d'après l'horaire. « À venir » : pas encore sur ce tronçon. Mise à jour toutes les 30 s."}</div>`;
   return h;
+}
+
+const shareLink = () => location.href.split("#")[0] + "#/import/" + E.encodeShare(S.favoris);
+
+function viewPartage() {
+  const link = shareLink();
+  let qr = "";
+  try { const q = qrcode(0, "M"); q.addData(link); q.make(); qr = q.createSvgTag({ cellSize: 5, margin: 2, scalable: true }); } catch (e) {}
+  return `<div class="nav"><a href="#/arrets">‹ Mes arrêts</a></div><h1>Partager mes arrêts</h1>
+    <div class="sub">${S.favoris.length} arrêts et leur ordre</div>
+    <div class="card" style="text-align:center"><div class="qr">${qr}</div>
+      <p class="dest" style="margin-top:12px;line-height:19px">Scanne ce code avec l'appareil photo de l'autre téléphone, ou ouvre le lien sur un autre appareil : tes arrêts y sont copiés.</p></div>
+    <button class="btn" data-copy>Copier le lien</button>
+    ${navigator.share ? `<button class="btn s" data-share>Envoyer… (SMS, WhatsApp, e-mail)</button>` : ""}
+    <div class="gfoot" style="text-align:center">Le lien contient seulement la liste des arrêts. Aucun compte, rien n'est stocké en ligne.</div>`;
+}
+
+let pendingImport = null;
+function viewImport(payload) {
+  const items = E.decodeShare(payload).slice(0, MAX);
+  pendingImport = items.map(x => {
+    const l = ligne(x.routeId), d = l && l.directions.find(y => y.dir === x.dir), st = d && d.stops.find(y => y.id === x.stopId);
+    return { key: E.quaiKey(x.routeId, x.dir, x.stopId), routeId: x.routeId, short: l ? l.short : x.routeId, color: l ? l.color : "8A8A8E",
+      textColor: l ? l.textColor : "FFFFFF", type: l ? l.type : 3, dir: x.dir, stopId: x.stopId, stopName: st ? st.name : x.stopId,
+      headsign: d ? d.headsign : "?", star: x.star };
+  });
+  if (!pendingImport.length) return `<div class="nav"><a href="#/">‹ Accueil</a></div><div class="msg">Lien de partage illisible.</div>`;
+  const have = new Set(S.favoris.map(f => f.key));
+  return `<div class="nav"><a href="#/">‹ Annuler</a></div><h1>Arrêts reçus</h1><div class="sub">${pendingImport.length} arrêt(s) partagé(s) avec toi</div>
+    <div class="group">${pendingImport.map(q => `<div class="item">${pill(q, true)}<div class="grow"><div class="ell" style="font-weight:600;font-size:15px">${nice(q.stopName)}</div>
+      <div class="dest ell" style="font-size:12px">→ ${nice(q.headsign)}</div></div>${have.has(q.key) ? `<span class="dest">déjà suivi</span>` : ""}</div>`).join("")}</div>
+    <div style="height:16px"></div>
+    <button class="btn" data-import="add">Ajouter à ma liste</button>
+    <button class="btn s" data-import="replace">Remplacer ma liste</button>
+    ${isAndroid ? `<a class="btn s" href="tamtomove://import/${esc(payload)}">Ouvrir dans l'appli Tam to Move</a>
+      <a class="btn s" href="${APK}">Télécharger l'appli Android</a>` : ""}
+    <div class="gfoot" style="text-align:center">10 arrêts au maximum. Tes arrêts restent dans ce navigateur.</div>`;
 }
 
 let lastQuery = "";
@@ -222,6 +264,8 @@ function render() {
     else { const d = l.directions.find(x => x.dir === +p[2]); h = d ? viewArret(l, d) : viewSens(l); }
   } else if (p[0] === "ajout") h = viewAjout(lastQuery);
   else if (p[0] === "suivi") h = viewSuivi(p.slice(1).join("/"));
+  else if (p[0] === "partage") h = viewPartage();
+  else if (p[0] === "import") h = viewImport(p[1] || "");
   else h = viewHome();
   const app = $("#app");
   // Ne pas reconstruire la page pendant une saisie (garde le clavier ouvert)
@@ -236,9 +280,26 @@ function toast(msg) {
 
 // ---------------------------------------------------------------- Actions
 
-document.addEventListener("click", e => {
-  const el = e.target.closest("[data-del],[data-mv],[data-add]");
+document.addEventListener("click", async e => {
+  const el = e.target.closest("[data-del],[data-mv],[data-add],[data-copy],[data-share],[data-import]");
   if (!el) return;
+  if (el.dataset.copy != null) {
+    try { await navigator.clipboard.writeText(shareLink()); toast("Lien copié"); } catch (x) { prompt("Copie ce lien :", shareLink()); }
+    return;
+  }
+  if (el.dataset.share != null) {
+    try { await navigator.share({ title: "Mes arrêts TaM", text: "Mes arrêts TaM sur Tam to Move", url: shareLink() }); } catch (x) {}
+    return;
+  }
+  if (el.dataset.import != null && pendingImport) {
+    const replace = el.dataset.import === "replace";
+    const base = replace ? [] : S.favoris;
+    const add = pendingImport.filter(n => !base.some(f => f.key === n.key));
+    S.favoris = [...base, ...add].slice(0, MAX); save();
+    toast(replace ? `Liste remplacée : ${S.favoris.length} arrêts` : `${Math.min(add.length, MAX - base.length)} arrêt(s) ajouté(s)`);
+    pendingImport = null; location.hash = "#/"; refresh();
+    return;
+  }
   if (el.dataset.del != null) {
     S.favoris.splice(+el.dataset.del, 1); save(); render();
   } else if (el.dataset.mv != null) {

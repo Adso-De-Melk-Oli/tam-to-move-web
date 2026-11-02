@@ -69,4 +69,23 @@ test("où est mon bus", () => {
 test("formats", () => {
   assert.equal(E.wait(now + 30, now), "Proche"); assert.equal(E.wait(now + 250, now), "4 min"); assert.equal(E.wait(now + 3900, now), "1 h 05");
 });
+
+test("GPS", () => {
+  const feed = E.parseFeed(readFileSync(dir + "tripupdate.pb"));
+  const veh = E.parseFeed(readFileSync(dir + "vehicles.pb")).vehicles;
+  assert.equal(veh.length, 1); assert.ok(Math.abs(veh[0].lat - 43.61075) < 1e-4);
+  const rt = E.predictions(R, quais, feed, now);
+  const b = E.board(rd, rt, now, quais[0]);
+  const stops = cat.lignes[0].directions.find(d => d.dir === 0).stops;
+  const t = E.track(quais[0], stops, feed, b.passages, now, 4, 5, 2, veh);
+  assert.ok(t.buses[0].gps); assert.ok(Math.abs(t.buses[0].frac - 0.75) < 0.05);
+});
+
+test("partage", () => {
+  const favs = [{ routeId: "6", dir: 0, stopId: "6236", star: true }, { routeId: "10", dir: 1, stopId: "1020", star: false }];
+  const p = E.encodeShare(favs);
+  assert.deepEqual(E.decodeShare(p), favs);
+  // Même encodage que l'appli Android (Base64 URL sans remplissage)
+  assert.equal(p, Buffer.from("6~0~6236~1,10~1~1020~0").toString("base64url"));
+});
 console.log(`${n} tests réussis`);

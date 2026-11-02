@@ -133,24 +133,43 @@ function alert(id, r) {
   return a;
 }
 
+function vehicle(r) {
+  const v = { tripId: null, routeId: null, lat: null, lon: null, stopId: null, status: 2, ts: null };
+  const dv = (rr) => { const x = new DataView(rr.b.buffer, rr.b.byteOffset + rr.p, 4).getFloat32(0, true); rr.p += 4; return x; };
+  each(r, (f, w) => {
+    if (f === 1 && w === 2) {
+      const t = r.sub();
+      each(t, (g, x) => { if (g === 1 && x === 2) v.tripId = t.str(); else if (g === 5 && x === 2) v.routeId = t.str(); else t.skip(x); });
+    } else if (f === 2 && w === 2) {
+      const p = r.sub();
+      each(p, (g, x) => { if (g === 1 && x === 5) v.lat = dv(p); else if (g === 2 && x === 5) v.lon = dv(p); else p.skip(x); });
+    } else if (f === 4 && w === 0) v.status = r.num();
+    else if (f === 5 && w === 0) v.ts = r.num();
+    else if (f === 7 && w === 2) v.stopId = r.str();
+    else r.skip(w);
+  });
+  return v.lat == null || v.lon == null ? null : v;
+}
+
 export function parseFeed(bytes) {
   const r = new Reader(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes));
-  const feed = { timestamp: null, trips: [], alerts: [] };
+  const feed = { timestamp: null, trips: [], alerts: [], vehicles: [] };
   each(r, (f, w) => {
     if (f === 1 && w === 2) {
       const h = r.sub();
       each(h, (g, x) => { if (g === 3 && x === 0) feed.timestamp = h.num(); else h.skip(x); });
     } else if (f === 2 && w === 2) {
       try {
-        const e = r.sub(); let id = "", deleted = false, tu = null, al = null;
+        const e = r.sub(); let id = "", deleted = false, tu = null, al = null, ve = null;
         each(e, (g, x) => {
           if (g === 1 && x === 2) id = e.str();
           else if (g === 2 && x === 0) deleted = e.num() !== 0;
           else if (g === 3 && x === 2) tu = tripUpdate(e.sub());
+          else if (g === 4 && x === 2) ve = vehicle(e.sub());
           else if (g === 5 && x === 2) al = e.sub();
           else e.skip(x);
         });
-        if (!deleted) { if (tu) feed.trips.push(tu); if (al) feed.alerts.push(alert(id, al)); }
+        if (!deleted) { if (tu) feed.trips.push(tu); if (al) feed.alerts.push(alert(id, al)); if (ve) feed.vehicles.push(ve); }
       } catch (e) { /* entité abîmée : ignorée */ }
     } else r.skip(w);
   });
@@ -313,12 +332,19 @@ export function alerts(quais, feed, now) {
 
 const STOP_SEC = 90;
 
-export function track(q, dirStops, feed, passages, now, count = 4, before = 5, after = 2) {
+/** Distance approximative en mètres. */
+function dist(a1, o1, a2, o2) {
+  const r = Math.PI / 180, x = (o2 - o1) * r * Math.cos((a1 + a2) / 2 * r), y = (a2 - a1) * r;
+  return Math.sqrt(x * x + y * y) * 6371000;
+}
+
+export function track(q, dirStops, feed, passages, now, count = 4, before = 5, after = 2, vehicles = []) {
   const me = dirStops.findIndex(s => s.id === q.stopId);
   if (me < 0) return null;
   const from = Math.max(0, me - before), to = Math.min(dirStops.length - 1, me + after);
   const indexOf = new Map(); dirStops.forEach((s, i) => { if (!indexOf.has(s.id)) indexOf.set(s.id, i); });
   const byTrip = new Map((feed ? feed.trips : []).filter(t => t.tripId).map(t => [t.tripId, t]));
+  const vehByTrip = new Map(vehicles.filter(v => v.tripId && now - (v.ts || now) < 300).map(v => [v.tripId, v]));
   const placed = [], far = [], taken = new Set();
   for (const p of passages.filter(p => !p.canceled && p.time >= now - 30).sort((a, b) => a.time - b.time).slice(0, count)) {
     let gi = null, waiting = false;
@@ -332,12 +358,30 @@ export function track(q, dirStops, feed, passages, now, count = 4, before = 5, a
         if (gi === 0 && dep > now + 90) waiting = true;
       }
     }
+    // Position GPS : affine le tronçon et l'avancement entre deux arrêts
+    let frac = 0.5, gps = false;
+    const v = p.realtime ? vehByTrip.get(p.trip) : null;
+    if (v && !waiting) {
+      const vi = indexOf.has(v.stopId) ? indexOf.get(v.stopId) : null;
+      const ni = vi ?? gi;
+      if (ni != null && ni <= me) {
+        gi = ni; gps = true;
+        if (v.status === 1 && vi != null) frac = 1;
+        else if (ni > 0) {
+          const a = dirStops[ni - 1], b = dirStops[ni];
+          if (a.lat && b.lat) {
+            const da = dist(a.lat, a.lon, v.lat, v.lon), db = dist(v.lat, v.lon, b.lat, b.lon);
+            if (da + db > 0) frac = Math.min(0.92, Math.max(0.08, da / (da + db)));
+          }
+        }
+      }
+    }
     const estimated = gi == null;
     if (gi == null) {
       gi = me - Math.ceil(Math.max(0, p.time - now) / STOP_SEC);
       if (gi < 0) { if (p.time - now <= (me + 2) * STOP_SEC) gi = 0; else waiting = true; }
     }
-    const bus = { trip: p.trip, index: gi - from, eta: p.time, realtime: p.realtime, estimated };
+    const bus = { trip: p.trip, index: gi - from, eta: p.time, realtime: p.realtime, estimated, frac, gps };
     if (waiting || gi < from || taken.has(gi)) far.push(bus); else { placed.push(bus); taken.add(gi); }
   }
   return { stops: dirStops.slice(from, to + 1), myIndex: me - from, buses: placed, far };
@@ -359,4 +403,18 @@ export function wait(e, now) {
   const m = Math.floor(s / 60);
   if (m >= 360) return hourWithDay(e, now); // au-delà de 6 h : l'heure (et le jour) parle mieux
   return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${pad(m % 60)}`;
+}
+
+// ---------------------------------------------------------------- Partage (même format que l'appli Android)
+
+const b64e = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const b64d = s => decodeURIComponent(escape(atob(s.replace(/-/g, "+").replace(/_/g, "/"))));
+
+export const encodeShare = favs => b64e(favs.map(f => `${f.routeId}~${f.dir}~${f.stopId}~${f.star ? 1 : 0}`).join(","));
+
+export function decodeShare(payload) {
+  try {
+    return b64d(payload).split(",").map(x => x.split("~")).filter(p => p.length >= 3 && /^\d+$/.test(p[1]))
+      .map(([routeId, dir, stopId, star]) => ({ routeId, dir: +dir, stopId, star: star === "1" }));
+  } catch (e) { return []; }
 }

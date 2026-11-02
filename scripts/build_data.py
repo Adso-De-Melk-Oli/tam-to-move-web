@@ -56,7 +56,13 @@ def build(z, out):
                            type=int(rt) if rt.isdigit() else 3)
     trips = {r["trip_id"]: (r.get("route_id", ""), r.get("service_id", ""), int(r.get("direction_id") or 0))
              for r in rows(z, "trips.txt")}
-    names = {r["stop_id"]: r.get("stop_name", "") for r in rows(z, "stops.txt")}
+    names, pos = {}, {}
+    for r in rows(z, "stops.txt"):
+        names[r["stop_id"]] = r.get("stop_name", "")
+        try:
+            pos[r["stop_id"]] = (round(float(r["stop_lat"]), 6), round(float(r["stop_lon"]), 6))
+        except (KeyError, ValueError):
+            pass
 
     # Une seule lecture de stop_times : on garde (seq, arrêt, heure) par trajet
     st = defaultdict(list)
@@ -90,7 +96,8 @@ def build(z, out):
                     stops.append(s)
             idx = {s: i for i, s in enumerate(stops)}
             dirs.append({"dir": d, "headsign": pretty(names.get(seq[-1], "?")),
-                         "stops": [{"id": s, "name": pretty(names.get(s, s))} for s in stops]})
+                         "stops": [dict({"id": s, "name": pretty(names.get(s, s))},
+                                    **({"lat": pos[s][0], "lon": pos[s][1]} if s in pos else {})) for s in stops]})
             tl = []
             for t2, v in st.items():
                 if trips[t2][0] != rid or trips[t2][2] != d:
