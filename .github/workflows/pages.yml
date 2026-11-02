@@ -1,0 +1,51 @@
+name: Publier la page
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # Chaque jour à 04:23 (heure de Paris en hiver) : horaires TaM du jour
+    - cron: "23 3 * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - name: Tests du moteur
+        run: |
+          python3 scripts/build_data.py test/data test/gtfs.zip
+          TZ=Europe/Paris node test/engine.test.mjs
+      - name: Horaires TaM
+        run: python3 scripts/build_data.py site/data
+      - name: Vérifier le relais
+        continue-on-error: true
+        run: |
+          RELAIS=$(grep -oE 'https://[^"]+' site/config.js || true)
+          [ -n "$RELAIS" ] && curl -s -D - -o /tmp/tu.pb -H "Origin: https://adso-de-melk-oli.github.io" "$RELAIS/trip-updates" | grep -iE "^(HTTP|access-control)" && ls -l /tmp/tu.pb
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.d.outputs.page_url }}
+    steps:
+      - id: d
+        uses: actions/deploy-pages@v4
