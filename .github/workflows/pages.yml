@@ -4,12 +4,16 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Nouvelle version de l'appli publiée : on met à jour version.json
+  release:
+    types: [published]
   schedule:
     # Chaque jour à 04:23 (heure de Paris en hiver) : horaires TaM du jour
     - cron: "23 3 * * *"
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -37,6 +41,21 @@ jobs:
         run: |
           RELAIS=$(grep -oE 'https://[^"]+' site/config.js || true)
           [ -n "$RELAIS" ] && curl -s -D - -o /tmp/tu.pb -H "Origin: https://adso-de-melk-oli.github.io" "$RELAIS/trip-updates" | grep -iE "^(HTTP|access-control)" && ls -l /tmp/tu.pb
+      - name: Fichier de version pour l'appli Android
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/${{ github.repository }}/releases/latest > /tmp/rel.json || echo '{}' > /tmp/rel.json
+          python3 - <<'PY'
+          import json
+          d = json.load(open("/tmp/rel.json"))
+          tag = d.get("tag_name", "")
+          v = int(tag.rsplit(".", 1)[-1]) if tag and tag.rsplit(".", 1)[-1].isdigit() else 0
+          url = next((a["browser_download_url"] for a in d.get("assets", []) if a["name"] == "Tam-to-Move.apk"), "")
+          json.dump({"version": v, "tag": tag, "url": url, "notes": (d.get("body") or "")[:600]},
+                    open("site/version.json", "w"), ensure_ascii=False)
+          print("version.json :", v, url)
+          PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: site }
