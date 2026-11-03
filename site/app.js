@@ -1,15 +1,11 @@
 // TaM to Move – page web. Favoris sauvegardés dans le navigateur (localStorage), rien n'est envoyé ailleurs.
-import * as E from "./engine.js?v=9";
-import { RELAIS } from "./config.js?v=9";
+import * as E from "./engine.js?v=10";
+import { RELAIS } from "./config.js?v=10";
 
 const MAX = 10;
 const KEY = "ttm.favoris";
-const DEFAULTS = [
-  ["6", 0, "6236", "Peyrou - Arc de Triomphe", "Euromédecine"],
-  ["6", 1, "2220", "Peyrou - Arc de Triomphe", "Albert 1er - Jardin des Plantes"],
-  ["6", 0, "3136", "Pierre Viala", "Euromédecine"],
-  ["6", 1, "3230", "Pierre Viala", "Albert 1er - Jardin des Plantes"],
-].map(([r, d, s, n, h]) => ({ key: E.quaiKey(r, d, s), routeId: r, short: "6", color: "E94190", textColor: "FFFFFF", type: 3, dir: d, stopId: s, stopName: n, headsign: h }));
+// Nouvelle visite : liste vide, la page propose d'ajouter un premier arrêt
+const DEFAULTS = [];
 
 const S = {
   favoris: load(), catalog: null, routes: {}, feed: null, rt: null, rtAt: null, alerts: [],
@@ -117,7 +113,10 @@ function viewHome() {
     h += `<button class="alert" onclick="this.classList.toggle('open')"><div class="i">!</div><div><b>${esc(a.title)}</b>${a.text ? `<p>${esc(a.text)}</p>` : ""}</div></button>`;
   }
   if (!S.favoris.length) {
-    h += `<div class="msg" style="text-align:center"><b style="color:var(--label)">Aucun arrêt suivi</b><br>Choisis jusqu'à 10 arrêts.<br><br><a href="#/ajout">Ajouter un arrêt</a></div>`;
+    h += `<div class="card" style="text-align:center;padding:26px 20px"><div style="font-size:40px">🚏</div>
+      <div style="font-weight:600;font-size:17px;margin-top:6px">Bienvenue sur TaM to Move</div>
+      <div class="dest" style="margin:8px 0 16px">Ajoute les arrêts que tu prends souvent : leurs prochains bus et trams s'affichent ici, en direct. Jusqu'à 10 arrêts, sur la ligne et dans le sens de ton choix. Ils restent dans ce navigateur.</div>
+      <a class="btn" href="#/ajout">Ajouter ton premier arrêt</a></div>`;
   }
   for (const b of boards()) {
     const f = b.quai, first = b.passages.find(p => !p.canceled);
