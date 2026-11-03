@@ -1,6 +1,6 @@
-// Tam to Move – page web. Favoris sauvegardés dans le navigateur (localStorage), rien n'est envoyé ailleurs.
-import * as E from "./engine.js?v=3";
-import { RELAIS } from "./config.js?v=3";
+// TaM to Move – page web. Favoris sauvegardés dans le navigateur (localStorage), rien n'est envoyé ailleurs.
+import * as E from "./engine.js?v=4";
+import { RELAIS } from "./config.js?v=4";
 
 const MAX = 10;
 const KEY = "ttm.favoris";
@@ -106,7 +106,7 @@ function status() {
 function viewHome() {
   const now = S.now;
   let h = `<div class="nav">${S.favoris.length ? `<a href="#/partage">Partager</a>` : "<span></span>"}<a class="action" href="#/arrets">Modifier</a></div>
-    <h1>Tam to Move</h1><div class="sub">${status()}</div>`;
+    <h1>TaM to Move</h1><div class="sub">${status()}</div>`;
   for (const a of S.alerts) {
     h += `<button class="alert" onclick="this.classList.toggle('open')"><div class="i">!</div><div><b>${esc(a.title)}</b>${a.text ? `<p>${esc(a.text)}</p>` : ""}</div></button>`;
   }
@@ -246,7 +246,7 @@ function viewImport(payload) {
     <div style="height:16px"></div>
     <button class="btn" data-import="add">Ajouter à ma liste</button>
     <button class="btn s" data-import="replace">Remplacer ma liste</button>
-    ${isAndroid ? `<a class="btn s" href="tamtomove://import/${esc(payload)}">Ouvrir dans l'appli Tam to Move</a>
+    ${isAndroid ? `<a class="btn s" href="tamtomove://import/${esc(payload)}">Ouvrir dans l'appli TaM to Move</a>
       <a class="btn s" href="${APK}">Télécharger l'appli Android</a>` : ""}
     <div class="gfoot" style="text-align:center">10 arrêts au maximum. Tes arrêts restent dans ce navigateur.</div>`;
 }
@@ -288,7 +288,7 @@ document.addEventListener("click", async e => {
     return;
   }
   if (el.dataset.share != null) {
-    try { await navigator.share({ title: "Mes arrêts TaM", text: "Mes arrêts TaM sur Tam to Move", url: shareLink() }); } catch (x) {}
+    try { await navigator.share({ title: "Mes arrêts TaM", text: "Mes arrêts TaM sur TaM to Move", url: shareLink() }); } catch (x) {}
     return;
   }
   if (el.dataset.import != null && pendingImport) {

@@ -1,4 +1,4 @@
-// Tam to Move – moteur de calcul (même logique que l'appli Android).
+// TaM to Move – moteur de calcul (même logique que l'appli Android).
 // Module sans dépendance : utilisable dans le navigateur et testé avec Node.
 
 // ---------------------------------------------------------------- Protobuf GTFS-Realtime

@@ -1,4 +1,4 @@
-// Relais Cloudflare pour Tam to Move (page web).
+// Relais Cloudflare pour TaM to Move (page web).
 // Les serveurs TaM n'autorisent pas la lecture depuis un navigateur (pas d'en-tête CORS) :
 // ce relais récupère UNIQUEMENT les 3 flux publics TaM et ajoute l'autorisation.
 const FLUX = {
@@ -18,7 +18,7 @@ export default {
     const path = new URL(request.url).pathname.replace(/\/+$/, "");
     const cible = FLUX[path];
     if (!cible) {
-      return new Response("Tam to Move – relais. Chemins : " + Object.keys(FLUX).join(", "), {
+      return new Response("TaM to Move – relais. Chemins : " + Object.keys(FLUX).join(", "), {
         status: path === "" ? 200 : 404, headers: { ...CORS, "content-type": "text/plain; charset=utf-8" },
       });
     }

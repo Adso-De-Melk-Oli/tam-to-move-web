@@ -1,6 +1,6 @@
 {
-  "name": "Tam to Move",
-  "short_name": "Tam to Move",
+  "name": "TaM to Move",
+  "short_name": "TaM to Move",
   "description": "Prochains passages TaM (Montpellier) à tes arrêts, en temps réel.",
   "start_url": "./",
   "scope": "./",
