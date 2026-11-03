@@ -1,6 +1,6 @@
 // TaM to Move – page web. Favoris sauvegardés dans le navigateur (localStorage), rien n'est envoyé ailleurs.
-import * as E from "./engine.js?v=10";
-import { RELAIS } from "./config.js?v=10";
+import * as E from "./engine.js?v=11";
+import { RELAIS } from "./config.js?v=11";
 
 const MAX = 10;
 const KEY = "ttm.favoris";
@@ -108,7 +108,7 @@ function status() {
 function viewHome() {
   const now = S.now;
   let h = `<div class="nav">${S.favoris.length ? `<a href="#/partage">Partager</a>` : "<span></span>"}<a class="action" href="#/arrets">Modifier</a></div>
-    <h1>TaM to Move</h1><div class="sub">${status()}</div>`;
+    <h1>TaM to Move</h1><div class="subtitle">Bus et tram en direct · Métropole de Montpellier</div><div class="sub">${status()}</div>`;
   for (const a of S.alerts) {
     h += `<button class="alert" onclick="this.classList.toggle('open')"><div class="i">!</div><div><b>${esc(a.title)}</b>${a.text ? `<p>${esc(a.text)}</p>` : ""}</div></button>`;
   }

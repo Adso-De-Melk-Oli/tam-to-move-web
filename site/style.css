@@ -109,3 +109,5 @@ h1.t2{font-size:30px;letter-spacing:-.6px;line-height:36px}
 .tr.term .rail::before { background: repeating-linear-gradient(var(--lcf) 0 5px, transparent 5px 10px); }
 .tr.term .rail::after { border-radius: 3px; border-color: var(--lcf); }
 .tr.term .n { color: var(--secondary, #8e8e93); }
+
+.subtitle{color:var(--sec);font-size:15px;font-weight:500;margin:-2px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
