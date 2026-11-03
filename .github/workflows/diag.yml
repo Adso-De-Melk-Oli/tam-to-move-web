@@ -1,0 +1,15 @@
+name: Diagnostic GTFS
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          curl -sSL -o /tmp/g.zip https://gtfsproxy.e-tam.fr/COMMON/GTFS.zip
+          python3 scripts/build_data.py /tmp/out /tmp/g.zip > /dev/null
+          python3 scripts/diag.py /tmp/g.zip /tmp/out/catalog.json > /tmp/diag.txt 2>&1 || true
+          cd /tmp && git init -q o && cp diag.txt o/ && cd o && git checkout -q -b diag && git add . && git -c user.name=ci -c user.email=ci@x commit -qm diag
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" diag

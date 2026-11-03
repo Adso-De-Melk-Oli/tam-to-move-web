@@ -76,7 +76,7 @@ def build(z, out):
     for v in st.values():
         v.sort()
 
-    # Trajet type par ligne et sens : le parcours le plus fréquent AUJOURD'HUI (travaux, déviations
+    # Trajet type par ligne et sens : parcours du jour (travaux, déviations (travaux, déviations
     # publiées par la TaM), sinon sur toute la période ; à égalité le plus long, puis le plus petit identifiant.
     from datetime import datetime
     from zoneinfo import ZoneInfo
@@ -103,7 +103,12 @@ def build(z, out):
         groups = defaultdict(list)
         for t in pool:
             groups[tuple(x[1] for x in st[t])].append(t)
-        best = max(sorted(groups.values(), key=min), key=lambda g: (len(g), len(st[g[0]])))
+        # Parcours complet : le plus long parmi les parcours fréquents du jour (les services partiels,
+        # dépôt ou fin de ligne anticipée, sont plus courts ; les variantes rares sont écartées)
+        maxc = max(len(g) for g in groups.values())
+        seuil = max(2, int(0.15 * maxc)) if maxc >= 2 else 1
+        ok = [g for g in groups.values() if len(g) >= seuil] or list(groups.values())
+        best = max(sorted(ok, key=min), key=lambda g: (len(st[g[0]]), len(g)))
         rep[k] = min(best)
 
     lignes, used_by_route = [], {}
