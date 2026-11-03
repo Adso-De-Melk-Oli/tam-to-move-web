@@ -54,8 +54,10 @@ def build(z, out):
                            color=r["route_color"].upper() if len(r.get("route_color", "")) == 6 else "8A8A8E",
                            text=r["route_text_color"].upper() if len(r.get("route_text_color", "")) == 6 else "FFFFFF",
                            type=int(rt) if rt.isdigit() else 3)
-    trips = {r["trip_id"]: (r.get("route_id", ""), r.get("service_id", ""), int(r.get("direction_id") or 0))
-             for r in rows(z, "trips.txt")}
+    trips, girouette = {}, {}
+    for r in rows(z, "trips.txt"):
+        trips[r["trip_id"]] = (r.get("route_id", ""), r.get("service_id", ""), int(r.get("direction_id") or 0))
+        girouette[r["trip_id"]] = (r.get("trip_headsign") or "").strip()
     names, pos = {}, {}
     for r in rows(z, "stops.txt"):
         names[r["stop_id"]] = r.get("stop_name", "")
@@ -133,6 +135,18 @@ def build(z, out):
                     tl.append([trips[t2][1], t2, times])
             tl.sort(key=lambda x: min(t for t in x[2] if t is not None))
             ddata[str(d)] = {"stops": stops, "trips": tl}
+        # Lignes en boucle (tram 4) : deux sens vers le même terminus → girouette du GTFS, sinon « · via … »
+        if len(dirs) == 2 and norm(dirs[0]["headsign"]) == norm(dirs[1]["headsign"]):
+            g = [pretty(girouette.get(rep.get((rid, x["dir"])), "")) if girouette.get(rep.get((rid, x["dir"]))) else "" for x in dirs]
+            if all(g) and norm(g[0]) != norm(g[1]):
+                for x, h in zip(dirs, g):
+                    x["headsign"] = h
+            else:
+                for x in dirs:
+                    start = x["stops"][0]["name"] if x["stops"] else ""
+                    via = next((st2["name"] for st2 in x["stops"][1:] if norm(st2["name"]) not in (norm(start), norm(x["headsign"]))), None)
+                    if via:
+                        x["headsign"] = x["headsign"] + " · via " + via
         if dirs:
             lignes.append({"routeId": rid, "short": m["short"], "long": m["long"], "color": m["color"],
                            "textColor": m["text"], "type": m["type"], "directions": dirs, "file": safe(rid)})
