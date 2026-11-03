@@ -1,0 +1,28 @@
+name: Diagnostic GTFS
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sSL -o g.zip https://gtfsproxy.e-tam.fr/COMMON/GTFS.zip
+          mkdir g && cd g && unzip -q ../g.zip
+          {
+          echo "== routes 4"; grep -i '^[^,]*,[^,]*4' routes.txt | head; head -1 routes.txt; grep -iE '(^|,)"?4[AB]?"?,' routes.txt | head
+          echo "== trips header"; head -1 trips.txt
+          python3 - <<'PY'
+          import csv, collections
+          r={x['route_id']:x for x in csv.DictReader(open('routes.txt',encoding='utf-8-sig'))}
+          ids=[k for k,v in r.items() if v['route_short_name'].strip().upper().startswith('4')]
+          print('routes', [(k, r[k]['route_short_name'], r[k]['route_long_name']) for k in ids])
+          c=collections.Counter()
+          for t in csv.DictReader(open('trips.txt',encoding='utf-8-sig')):
+              if t['route_id'] in ids: c[(t['route_id'], t.get('direction_id'), t.get('trip_headsign'), t.get('shape_id','')[:20])]+=1
+          for k,v in c.most_common(20): print(v,k)
+          PY
+          } > ../diag.txt 2>&1
+          cd ..
+          git init -q out && cp diag.txt out/ && cd out && git checkout -q -b diag && git add . && git -c user.name=ci -c user.email=ci@x commit -qm diag
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" diag
