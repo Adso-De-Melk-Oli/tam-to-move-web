@@ -74,13 +74,35 @@ def build(z, out):
     for v in st.values():
         v.sort()
 
-    # Trajet type par ligne et sens : le plus long (à égalité, le plus petit identifiant)
+    # Trajet type par ligne et sens : le parcours le plus fréquent AUJOURD'HUI (travaux, déviations
+    # publiées par la TaM), sinon sur toute la période ; à égalité le plus long, puis le plus petit identifiant.
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    today = datetime.now(ZoneInfo("Europe/Paris")).date()
+    tstr = today.strftime("%Y%m%d")
+    dow = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"][today.weekday()]
+    active = set()
+    for r in rows(z, "calendar.txt"):
+        if r.get(dow) == "1" and (r.get("start_date") or "0") <= tstr <= (r.get("end_date") or "99999999"):
+            active.add(r["service_id"])
+    for r in rows(z, "calendar_dates.txt"):
+        if r.get("date") == tstr:
+            if r.get("exception_type") == "1":
+                active.add(r["service_id"])
+            elif r.get("exception_type") == "2":
+                active.discard(r["service_id"])
+    by_line = defaultdict(list)
+    for tid in st:
+        route, service, d = trips[tid]
+        by_line[(route, d)].append(tid)
     rep = {}
-    for tid, v in st.items():
-        route, _, d = trips[tid]
-        cur = rep.get((route, d))
-        if cur is None or len(v) > len(st[cur]) or (len(v) == len(st[cur]) and tid < cur):
-            rep[(route, d)] = tid
+    for k, ids in by_line.items():
+        pool = [t for t in ids if trips[t][1] in active] or ids
+        groups = defaultdict(list)
+        for t in pool:
+            groups[tuple(x[1] for x in st[t])].append(t)
+        best = max(sorted(groups.values(), key=min), key=lambda g: (len(g), len(st[g[0]])))
+        rep[k] = min(best)
 
     lignes, used_by_route = [], {}
     for rid, m in routes.items():
