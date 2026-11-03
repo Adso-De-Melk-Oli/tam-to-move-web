@@ -1,0 +1,279 @@
+== 1 « Mosson - Gare Sud de France »
+  sens 0 → Gare Sud de France : 31 arrêts, Mosson … ; plus long 31 (Mosson → Gare Sud de France, 1117 trajets)
+      1117 trajets · 31 arrêts · Mosson → Gare Sud de France
+        30 trajets · 27 arrêts · Hauts de Massane → Gare Sud de France
+         6 trajets · 23 arrêts · Occitanie Hôpitaux - Facultés → Gare Sud de France
+  sens 1 → Mosson : 31 arrêts, Gare Sud de France … ; plus long 31 (Gare Sud de France → Mosson, 1147 trajets)
+      1147 trajets · 31 arrêts · Gare Sud de France → Mosson
+        69 trajets ·  4 arrêts · Saint-Paul → Mosson
+         6 trajets · 23 arrêts · Gare Sud de France → Occitanie Hôpitaux - Facultés
+== 2 « St-Jean de Védas Centre - Jacou »
+  sens 0 → Jacou : 28 arrêts, Saint-Jean de Védas Centre … ; plus long 28 (Saint-Jean de Védas Centre → Jacou, 127 trajets)
+       319 trajets · 24 arrêts · Sabines → Jacou
+       310 trajets · 24 arrêts · Saint-Jean de Védas Centre → Notre-Dame de Sablassou
+       127 trajets · 28 arrêts · Saint-Jean de Védas Centre → Jacou
+        81 trajets · 20 arrêts · Sabines → Notre-Dame de Sablassou
+  sens 1 → Saint-Jean de Védas Centre : 28 arrêts, Jacou … ; plus long 28 (Jacou → Saint-Jean de Védas Centre, 160 trajets)
+       286 trajets · 24 arrêts · Jacou → Sabines
+       286 trajets · 24 arrêts · Notre-Dame de Sablassou → Saint-Jean de Védas Centre
+       160 trajets · 28 arrêts · Jacou → Saint-Jean de Védas Centre
+       110 trajets · 20 arrêts · Notre-Dame de Sablassou → Sabines
+== 3 « Juvignac - Lattes / Pérols »
+  sens 0 → Juvignac : 26 arrêts, Pérols Étang de l'Or … ; plus long 26 (Pérols Étang de l'Or → Juvignac, 312 trajets)
+       312 trajets · 26 arrêts · Pérols Étang de l'Or → Juvignac
+       289 trajets · 23 arrêts · Lattes Centre → Mosson
+       123 trajets · 24 arrêts · Lattes Centre → Juvignac
+       100 trajets · 25 arrêts · Pérols Étang de l'Or → Mosson
+  sens 1 → Pérols Étang de l'Or : 26 arrêts, Juvignac … ; plus long 26 (Juvignac → Pérols Étang de l'Or, 74 trajets)
+       350 trajets · 24 arrêts · Juvignac → Lattes Centre
+       338 trajets · 25 arrêts · Mosson → Pérols Étang de l'Or
+        74 trajets · 26 arrêts · Juvignac → Pérols Étang de l'Or
+        62 trajets · 23 arrêts · Mosson → Lattes Centre
+== 4 « Garcia Lorca - Garcia Lorca »
+  sens 0 → Sens A · via Restanque : 19 arrêts, Garcia Lorca … ; plus long 19 (Garcia Lorca → Garcia Lorca, 621 trajets)
+       621 trajets · 19 arrêts · Garcia Lorca → Garcia Lorca
+        21 trajets · 16 arrêts · Nouveau Saint-Roch → Garcia Lorca
+         7 trajets ·  6 arrêts · Garcia Lorca → Gare Saint-Roch - République
+  sens 1 → Sens B · via La Rauze : 19 arrêts, Garcia Lorca … ; plus long 19 (Garcia Lorca → Garcia Lorca, 616 trajets)
+       616 trajets · 19 arrêts · Garcia Lorca → Garcia Lorca
+        30 trajets ·  7 arrêts · Observatoire → Garcia Lorca
+        14 trajets · 14 arrêts · Garcia Lorca → Gare Saint-Roch - République
+== 5 « Clapiers - Grès de Montpellier »
+  sens 0 → Clapiers : 26 arrêts, Grés de Montpellier … ; plus long 26 (Grés de Montpellier → Clapiers, 701 trajets)
+       701 trajets · 26 arrêts · Grés de Montpellier → Clapiers
+        15 trajets ·  8 arrêts · Saint-Eloi - Docteur Pezet → Clapiers
+  sens 1 → Grés de Montpellier : 26 arrêts, Clapiers … ; plus long 26 (Clapiers → Grés de Montpellier, 699 trajets)
+       699 trajets · 26 arrêts · Clapiers → Grés de Montpellier
+        25 trajets · 12 arrêts · Gambetta → Grés de Montpellier
+        11 trajets · 18 arrêts · Boutonnet - Cité des Arts → Grés de Montpellier
+== 6 « Euromédecine - Albert 1er »
+  sens 0 → Euromédecine : 22 arrêts, Albert 1er - Jardin des Plantes … ; plus long 22 (Albert 1er - Jardin des Plantes → Euromédecine, 317 trajets)
+       317 trajets · 22 arrêts · Albert 1er - Jardin des Plantes → Euromédecine
+  sens 1 → Albert 1er - Jardin des Plantes : 24 arrêts, Euromédecine … ; plus long 24 (Euromédecine → Albert 1er - Jardin des Plantes, 319 trajets)
+       319 trajets · 24 arrêts · Euromédecine → Albert 1er - Jardin des Plantes
+== 7 « Hôtel du Département - Albert 1e »
+  sens 0 → Albert 1er - Jardin des Plantes : 14 arrêts, Hôtel du Département … ; plus long 14 (Hôtel du Département → Albert 1er - Jardin des Plantes, 317 trajets)
+       317 trajets · 14 arrêts · Hôtel du Département → Albert 1er - Jardin des Plantes
+  sens 1 → Hôtel du Département : 14 arrêts, Albert 1er - Jardin des Plantes … ; plus long 14 (Albert 1er - Jardin des Plantes → Hôtel du Département, 319 trajets)
+       319 trajets · 14 arrêts · Albert 1er - Jardin des Plantes → Hôtel du Département
+== 8 « Centrayrargues - Gare Saint-Roch »
+  sens 0 → Gare Saint-Roch - Pont de Sète : 13 arrêts, Centrayrargues … ; plus long 13 (Centrayrargues → Gare Saint-Roch - Pont de Sète, 83 trajets)
+        83 trajets · 13 arrêts · Centrayrargues → Gare Saint-Roch - Pont de Sète
+  sens 1 → Centrayrargues : 10 arrêts, Gare Saint-Roch - Pont de Sète … ; plus long 10 (Gare Saint-Roch - Pont de Sète → Centrayrargues, 83 trajets)
+        83 trajets · 10 arrêts · Gare Saint-Roch - Pont de Sète → Centrayrargues
+== 10 « Cimetière St-Lazare - Celleneuve »
+  sens 0 → Celleneuve : 24 arrêts, Cimetière Saint-Lazare … ; plus long 24 (Cimetière Saint-Lazare → Celleneuve, 172 trajets)
+       172 trajets · 24 arrêts · Cimetière Saint-Lazare → Celleneuve
+  sens 1 → Cimetière Saint-Lazare : 26 arrêts, Celleneuve … ; plus long 26 (Celleneuve → Cimetière Saint-Lazare, 173 trajets)
+       173 trajets · 26 arrêts · Celleneuve → Cimetière Saint-Lazare
+== 11 « La Martelle - Tournezy »
+  sens 0 → Tournezy : 29 arrêts, La Martelle … ; plus long 29 (La Martelle → Tournezy, 292 trajets)
+       292 trajets · 29 arrêts · La Martelle → Tournezy
+  sens 1 → La Martelle : 32 arrêts, Tournezy … ; plus long 32 (Tournezy → La Martelle, 298 trajets)
+       298 trajets · 32 arrêts · Tournezy → La Martelle
+== 13 « Occitanie - Charles de Gaulle »
+  sens 0 → Charles de Gaulle : 21 arrêts, Occitanie Hôpitaux - Facultés … ; plus long 21 (Occitanie Hôpitaux - Facultés → Charles de Gaulle, 136 trajets)
+       136 trajets · 21 arrêts · Occitanie Hôpitaux - Facultés → Charles de Gaulle
+       134 trajets · 20 arrêts · Occitanie Hôpitaux - Facultés → Charles de Gaulle
+  sens 1 → Occitanie Hôpitaux - Facultés : 21 arrêts, Charles de Gaulle … ; plus long 21 (Charles de Gaulle → Occitanie Hôpitaux - Facultés, 136 trajets)
+       136 trajets · 21 arrêts · Charles de Gaulle → Occitanie Hôpitaux - Facultés
+       134 trajets · 20 arrêts · Charles de Gaulle → Occitanie Hôpitaux - Facultés
+== 14 « Léon Blum - Place de l'Europe »
+  sens 0 → Place de l'Europe : 30 arrêts, Léon Blum … ; plus long 30 (Léon Blum → Place de l'Europe, 210 trajets)
+       210 trajets · 30 arrêts · Léon Blum → Place de l'Europe
+  sens 1 → Léon Blum : 29 arrêts, Place de l'Europe … ; plus long 29 (Place de l'Europe → Léon Blum, 211 trajets)
+       211 trajets · 29 arrêts · Place de l'Europe → Léon Blum
+== 15 « Gare Sud de France - Sabines »
+  sens 0 → Sabines : 43 arrêts, Gare Sud de France … ; plus long 44 (Gare Sud de France → Sabines, 218 trajets)  <<< PLUS COURT que le plus long
+       218 trajets · 44 arrêts · Gare Sud de France → Sabines
+        60 trajets · 43 arrêts · Gare Sud de France → Sabines
+        21 trajets · 28 arrêts · Charles de Gaulle → Sabines
+        21 trajets · 27 arrêts · Charles de Gaulle → Sabines
+  sens 1 → Gare Sud de France : 44 arrêts, Sabines … ; plus long 44 (Sabines → Gare Sud de France, 277 trajets)
+       277 trajets · 44 arrêts · Sabines → Gare Sud de France
+        38 trajets · 28 arrêts · Sabines → Charles de Gaulle
+== 16 « Ch. de Gaulle - Port Marianne »
+  sens 0 → Port Marianne : 14 arrêts, Charles de Gaulle … ; plus long 14 (Charles de Gaulle → Port Marianne, 268 trajets)
+       268 trajets · 14 arrêts · Charles de Gaulle → Port Marianne
+  sens 1 → Charles de Gaulle : 14 arrêts, Port Marianne … ; plus long 14 (Port Marianne → Charles de Gaulle, 268 trajets)
+       268 trajets · 14 arrêts · Port Marianne → Charles de Gaulle
+== 17 « Les Bouisses - Gare Saint-Roch »
+  sens 0 → Gare Saint-Roch - Pont de Sète : 20 arrêts, Les Bouisses … ; plus long 20 (Les Bouisses → Gare Saint-Roch - Pont de Sète, 270 trajets)
+       270 trajets · 20 arrêts · Les Bouisses → Gare Saint-Roch - Pont de Sète
+  sens 1 → Les Bouisses : 20 arrêts, Gare Saint-Roch - Pont de Sète … ; plus long 20 (Gare Saint-Roch - Pont de Sète → Les Bouisses, 270 trajets)
+       270 trajets · 20 arrêts · Gare Saint-Roch - Pont de Sète → Les Bouisses
+== 18 « Sabines - Maurin - Lattes Centre »
+  sens 0 → Sabines : 12 arrêts, Lattes Centre … ; plus long 12 (Lattes Centre → Sabines, 684 trajets)
+       684 trajets · 12 arrêts · Lattes Centre → Sabines
+  sens 1 → Lattes Centre : 13 arrêts, Sabines … ; plus long 13 (Sabines → Lattes Centre, 684 trajets)
+       684 trajets · 13 arrêts · Sabines → Lattes Centre
+== 19 « P. Coubertin - Hôtel Département »
+  sens 0 → Hôtel du Département : 17 arrêts, Pierre de Coubertin … ; plus long 17 (Pierre de Coubertin → Hôtel du Département, 333 trajets)
+       333 trajets · 17 arrêts · Pierre de Coubertin → Hôtel du Département
+  sens 1 → Pierre de Coubertin : 18 arrêts, Hôtel du Département … ; plus long 18 (Hôtel du Département → Pierre de Coubertin, 337 trajets)
+       337 trajets · 18 arrêts · Hôtel du Département → Pierre de Coubertin
+== 20 « St-Jean le Sec - Parc Font-Colombe »
+  sens 0 → Parc Font-Colombe : 15 arrêts, Saint-Jean le Sec … ; plus long 15 (Saint-Jean le Sec → Parc Font-Colombe, 154 trajets)
+       254 trajets · 14 arrêts · Saint-Jean le Sec → Parc Font-Colombe
+       188 trajets · 12 arrêts · Saint-Jean le Sec → Parc Font-Colombe
+       154 trajets · 15 arrêts · Saint-Jean le Sec → Parc Font-Colombe
+       132 trajets · 13 arrêts · Saint-Jean le Sec → Parc Font-Colombe
+  sens 1 → Saint-Jean le Sec : 15 arrêts, Parc Font-Colombe … ; plus long 15 (Parc Font-Colombe → Saint-Jean le Sec, 132 trajets)
+       276 trajets · 14 arrêts · Parc Font-Colombe → Saint-Jean le Sec
+       166 trajets · 12 arrêts · Parc Font-Colombe → Saint-Jean le Sec
+       154 trajets · 13 arrêts · Parc Font-Colombe → Saint-Jean le Sec
+       132 trajets · 15 arrêts · Parc Font-Colombe → Saint-Jean le Sec
+== 21 « ND de Sablassou - Vendargues »
+  sens 0 → Versant : 34 arrêts, Notre-Dame de Sablassou … ; plus long 34 (Notre-Dame de Sablassou → Versant, 280 trajets)
+       360 trajets · 31 arrêts · Notre-Dame de Sablassou → Versant
+       280 trajets · 34 arrêts · Notre-Dame de Sablassou → Versant
+  sens 1 → Notre-Dame de Sablassou : 35 arrêts, Versant … ; plus long 35 (Versant → Notre-Dame de Sablassou, 280 trajets)
+       338 trajets · 32 arrêts · Versant → Notre-Dame de Sablassou
+       280 trajets · 35 arrêts · Versant → Notre-Dame de Sablassou
+== 22 « Cirad de Baillarguet - Clapiers - Jacou »
+  sens 0 → Collège Pierre Mendès France : 30 arrêts, Cirad de Baillarguet … ; plus long 30 (Cirad de Baillarguet → Collège Pierre Mendès France, 882 trajets)
+       882 trajets · 30 arrêts · Cirad de Baillarguet → Collège Pierre Mendès France
+  sens 1 → Cirad de Baillarguet : 30 arrêts, Collège Pierre Mendès France … ; plus long 30 (Collège Pierre Mendès France → Cirad de Baillarguet, 860 trajets)
+       860 trajets · 30 arrêts · Collège Pierre Mendès France → Cirad de Baillarguet
+== 23 « Clapiers - Prades-le-Lez »
+  sens 0 → Sens A · via Distillerie : 21 arrêts, Clapiers … ; plus long 21 (Clapiers → Clapiers, 618 trajets)
+       618 trajets · 21 arrêts · Clapiers → Clapiers
+  sens 1 → Sens B · via Distillerie : 21 arrêts, Clapiers … ; plus long 21 (Clapiers → Clapiers, 618 trajets)
+       618 trajets · 21 arrêts · Clapiers → Clapiers
+== 24 « Grabels: La Valsière - Le Pradas »
+  sens 0 → Le Pradas : 19 arrêts, La Valsière … ; plus long 19 (La Valsière → Le Pradas, 1014 trajets)
+      1014 trajets · 19 arrêts · La Valsière → Le Pradas
+  sens 1 → La Valsière : 19 arrêts, Le Pradas … ; plus long 19 (Le Pradas → La Valsière, 1014 trajets)
+      1014 trajets · 19 arrêts · Le Pradas → La Valsière
+== 25 « Courpouyran - Le Martinet »
+  sens 0 → Courpouyran : 23 arrêts, Le Martinet … ; plus long 23 (Le Martinet → Courpouyran, 618 trajets)
+       618 trajets · 23 arrêts · Le Martinet → Courpouyran
+  sens 1 → Le Martinet : 23 arrêts, Courpouyran … ; plus long 23 (Courpouyran → Le Martinet, 596 trajets)
+       596 trajets · 23 arrêts · Courpouyran → Le Martinet
+== 26 « Montferrier-sur-Lez - Montferrier Olympe/Cirad »
+  sens 0 → Cirad de Baillarguet : 18 arrêts, Montferrier-sur-Lez … ; plus long 18 (Montferrier-sur-Lez → Cirad de Baillarguet, 110 trajets)
+       552 trajets · 15 arrêts · Montferrier-sur-Lez → Olympe
+       110 trajets · 18 arrêts · Montferrier-sur-Lez → Cirad de Baillarguet
+  sens 1 → Montferrier-sur-Lez : 18 arrêts, Cirad de Baillarguet … ; plus long 18 (Cirad de Baillarguet → Montferrier-sur-Lez, 110 trajets)
+       552 trajets · 15 arrêts · Olympe → Montferrier-sur-Lez
+       110 trajets · 18 arrêts · Cirad de Baillarguet → Montferrier-sur-Lez
+== 27 « Stade de Montaud- Gare de Baillargues »
+  sens 0 → Gare de Baillargues : 20 arrêts, Stade de Montaud … ; plus long 20 (Stade de Montaud → Gare de Baillargues, 51 trajets)
+        51 trajets · 20 arrêts · Stade de Montaud → Gare de Baillargues
+  sens 1 → Stade de Montaud : 19 arrêts, Gare de Baillargues … ; plus long 19 (Gare de Baillargues → Stade de Montaud, 51 trajets)
+        51 trajets · 19 arrêts · Gare de Baillargues → Stade de Montaud
+== 28 « Boirargues - Cabanes Perols »
+  sens 0 → Cabanes de Pérols : 11 arrêts, Soriech … ; plus long 11 (Soriech → Cabanes de Pérols, 78 trajets)
+        78 trajets · 11 arrêts · Soriech → Cabanes de Pérols
+  sens 1 → Soriech : 11 arrêts, Cabanes de Pérols … ; plus long 11 (Cabanes de Pérols → Soriech, 78 trajets)
+        78 trajets · 11 arrêts · Cabanes de Pérols → Soriech
+== 30 « Le Crès Jean Jaurès / Le Crès Maumarin »
+  sens 0 → Jean Jaurès : 12 arrêts, Via Domitia … ; plus long 12 (Via Domitia → Jean Jaurès, 728 trajets)
+       728 trajets ·  8 arrêts · Maumarin → Via Domitia
+       728 trajets · 12 arrêts · Via Domitia → Jean Jaurès
+  sens 1 → Via Domitia : 12 arrêts, Jean Jaurès … ; plus long 12 (Jean Jaurès → Via Domitia, 728 trajets)
+       728 trajets · 12 arrêts · Jean Jaurès → Via Domitia
+       728 trajets ·  8 arrêts · Via Domitia → Maumarin
+== 31 « ND Sablassou - Baillargues via Sussargues/StGeniès »
+  sens 0 → Gare de Baillargues : 35 arrêts, Notre-Dame de Sablassou … ; plus long 35 (Notre-Dame de Sablassou → Gare de Baillargues, 48 trajets)
+        48 trajets · 35 arrêts · Notre-Dame de Sablassou → Gare de Baillargues
+  sens 1 → Notre-Dame de Sablassou : 35 arrêts, Gare de Baillargues … ; plus long 35 (Gare de Baillargues → Notre-Dame de Sablassou, 51 trajets)
+        51 trajets · 35 arrêts · Gare de Baillargues → Notre-Dame de Sablassou
+== 32 « Garcia Lorca - Villeneuve-lès-M./Saint-Jean de V. »
+  sens 0 → Saint-Jean le Sec : 21 arrêts, Garcia Lorca … ; plus long 21 (Garcia Lorca → Saint-Jean le Sec, 364 trajets)
+       386 trajets · 20 arrêts · Garcia Lorca → Saint-Jean le Sec
+       364 trajets · 21 arrêts · Garcia Lorca → Saint-Jean le Sec
+  sens 1 → Garcia Lorca : 24 arrêts, Saint-Jean le Sec … ; plus long 24 (Saint-Jean le Sec → Garcia Lorca, 386 trajets)
+       408 trajets · 23 arrêts · Saint-Jean le Sec → Garcia Lorca
+       386 trajets · 24 arrêts · Saint-Jean le Sec → Garcia Lorca
+== 33 « St-Jean de Védas (Centre)-Fabrègues »
+  sens 0 → Lou Paillas : 17 arrêts, Rondelet … ; plus long 17 (Rondelet → Lou Paillas, 66 trajets)
+       402 trajets · 14 arrêts · Saint-Jean de Védas Centre → Lou Paillas
+        66 trajets · 17 arrêts · Rondelet → Lou Paillas
+        66 trajets · 16 arrêts · Rondelet → Lou Paillas
+  sens 1 → Rondelet : 17 arrêts, Lou Paillas … ; plus long 17 (Lou Paillas → Rondelet, 132 trajets)
+       424 trajets · 15 arrêts · Lou Paillas → Saint-Jean de Védas Centre
+       132 trajets · 17 arrêts · Lou Paillas → Rondelet
+== 34 « Mosson - Cournonsec »
+  sens 0 → Les Clavoux : 30 arrêts, Mosson … ; plus long 30 (Mosson → Les Clavoux, 596 trajets)
+       596 trajets · 30 arrêts · Mosson → Les Clavoux
+        22 trajets · 16 arrêts · Mosson → La Bornière
+  sens 1 → Mosson : 29 arrêts, Les Clavoux … ; plus long 29 (Les Clavoux → Mosson, 596 trajets)
+       596 trajets · 29 arrêts · Les Clavoux → Mosson
+== 35 « Ch. de Gaulle-A.Rouge/Aires »
+  sens 0 → Aube Rouge : 19 arrêts, Charles de Gaulle … ; plus long 19 (Charles de Gaulle → Aube Rouge, 72 trajets)
+        72 trajets · 19 arrêts · Charles de Gaulle → Aube Rouge
+        72 trajets · 18 arrêts · Charles de Gaulle → Les Aires
+  sens 1 → Charles de Gaulle : 18 arrêts, Aube Rouge … ; plus long 18 (Aube Rouge → Charles de Gaulle, 72 trajets)
+        72 trajets · 18 arrêts · Aube Rouge → Charles de Gaulle
+        72 trajets · 17 arrêts · Les Aires → Charles de Gaulle
+== 36 « Charles de Gaulle - Cap Alpha - Stade de Montaud »
+  sens 0 → Charles de Gaulle : 23 arrêts, Stade de Montaud … ; plus long 23 (Stade de Montaud → Charles de Gaulle, 562 trajets)
+       562 trajets · 23 arrêts · Stade de Montaud → Charles de Gaulle
+  sens 1 → Stade de Montaud : 20 arrêts, Charles de Gaulle … ; plus long 20 (Charles de Gaulle → Stade de Montaud, 540 trajets)
+       540 trajets · 20 arrêts · Charles de Gaulle → Stade de Montaud
+== 38 « Grés de Montpellier - Cournonsec »
+  sens 0 → Les Clavoux : 31 arrêts, Grés de Montpellier … ; plus long 31 (Grés de Montpellier → Les Clavoux, 880 trajets)
+       880 trajets · 31 arrêts · Grés de Montpellier → Les Clavoux
+       198 trajets · 17 arrêts · Grés de Montpellier → La Bornière
+       176 trajets · 16 arrêts · Grés de Montpellier → Les Clavoux
+       126 trajets · 15 arrêts · Les Clavoux → Grés de Montpellier
+  sens 1 → Grés de Montpellier : 30 arrêts, Les Clavoux … ; plus long 30 (Les Clavoux → Grés de Montpellier, 968 trajets)
+       968 trajets · 30 arrêts · Les Clavoux → Grés de Montpellier
+       132 trajets · 17 arrêts · La Bornière → Grés de Montpellier
+         6 trajets · 15 arrêts · Les Clavoux → Grés de Montpellier
+== 40 « Mosson - St-Georges d'Orques »
+  sens 0 → Mijoulan : 14 arrêts, Mosson … ; plus long 14 (Mosson → Mijoulan, 601 trajets)
+       601 trajets · 14 arrêts · Mosson → Mijoulan
+  sens 1 → Mosson : 14 arrêts, Mijoulan … ; plus long 14 (Mijoulan → Mosson, 596 trajets)
+       596 trajets · 14 arrêts · Mijoulan → Mosson
+== 42 « Mosson - Murviel lès Montpellier »
+  sens 0 → La Rouvière Longue : 18 arrêts, Mosson … ; plus long 18 (Mosson → La Rouvière Longue, 326 trajets)
+       326 trajets · 18 arrêts · Mosson → La Rouvière Longue
+  sens 1 → Mosson : 18 arrêts, La Rouvière Longue … ; plus long 18 (La Rouvière Longue → Mosson, 341 trajets)
+       341 trajets · 18 arrêts · La Rouvière Longue → Mosson
+== 43 « St-Jean-le-Sec - Saussan - Pignan »
+  sens 0 → La Bornière : 17 arrêts, Saint-Jean de Védas Centre … ; plus long 17 (Saint-Jean de Védas Centre → La Bornière, 512 trajets)
+       512 trajets · 17 arrêts · Saint-Jean de Védas Centre → La Bornière
+  sens 1 → Saint-Jean de Védas Centre : 17 arrêts, La Bornière … ; plus long 17 (La Bornière → Saint-Jean de Védas Centre, 534 trajets)
+       534 trajets · 17 arrêts · La Bornière → Saint-Jean de Védas Centre
+== 44 « Navette Gare Villeneuve-les-M. »
+  sens 0 → Gare Villeneuve-lès-Maguelone : 12 arrêts, Arnel … ; plus long 12 (Arnel → Gare Villeneuve-lès-Maguelone, 137 trajets)
+       137 trajets · 12 arrêts · Arnel → Gare Villeneuve-lès-Maguelone
+  sens 1 → Arnel : 14 arrêts, Gare Villeneuve-lès-Maguelone … ; plus long 14 (Gare Villeneuve-lès-Maguelone → Arnel, 92 trajets)
+        92 trajets · 14 arrêts · Gare Villeneuve-lès-Maguelone → Arnel
+== 46 « ND Sablassou - Castries College »
+  sens 0 → Collège Les Pins : 10 arrêts, Notre-Dame de Sablassou … ; plus long 10 (Notre-Dame de Sablassou → Collège Les Pins, 596 trajets)
+       596 trajets · 10 arrêts · Notre-Dame de Sablassou → Collège Les Pins
+  sens 1 → Notre-Dame de Sablassou : 10 arrêts, Collège Les Pins … ; plus long 10 (Collège Les Pins → Notre-Dame de Sablassou, 596 trajets)
+       596 trajets · 10 arrêts · Collège Les Pins → Notre-Dame de Sablassou
+== 47 « Université Montpellier Triolet »
+  sens 0 → Université Montpellier - Triolet : 13 arrêts, Université Montpellier - Triolet … ; plus long 13 (Université Montpellier - Triolet → Université Montpellier - Triolet, 1276 trajets)
+      1276 trajets · 13 arrêts · Université Montpellier - Triolet → Université Montpellier - Triolet
+== 52 « Pl. de France - Cim. St.Etienne »
+  sens 0 → Cimetière Saint-Étienne : 5 arrêts, Place de France … ; plus long 5 (Place de France → Cimetière Saint-Étienne, 128 trajets)
+       128 trajets ·  5 arrêts · Place de France → Cimetière Saint-Étienne
+  sens 1 → Place de France : 5 arrêts, Cimetière Saint-Étienne … ; plus long 6 (Cimetière Saint-Étienne → Place de France, 104 trajets)  <<< PLUS COURT que le plus long
+       104 trajets ·  6 arrêts · Cimetière Saint-Étienne → Place de France
+        28 trajets ·  5 arrêts · Cimetière Saint-Étienne → Place de France
+== 53 « Sabines - Saint-Cléophas »
+  sens 0 → Saint-Cléophas : 12 arrêts, Sabines … ; plus long 12 (Sabines → Saint-Cléophas, 140 trajets)
+       140 trajets · 12 arrêts · Sabines → Saint-Cléophas
+  sens 1 → Sabines : 12 arrêts, Saint-Cléophas … ; plus long 12 (Saint-Cléophas → Sabines, 140 trajets)
+       140 trajets · 12 arrêts · Saint-Cléophas → Sabines
+== 91 « Substitution Ligne 1 »
+  sens 0 → Occitanie Hôpitaux - Facultés : 9 arrêts, Mosson … ; plus long 9 (Mosson → Occitanie Hôpitaux - Facultés, 466 trajets)
+       466 trajets ·  9 arrêts · Mosson → Occitanie Hôpitaux - Facultés
+  sens 1 → Mosson : 9 arrêts, Occitanie Hôpitaux - Facultés … ; plus long 9 (Occitanie Hôpitaux - Facultés → Mosson, 472 trajets)
+       472 trajets ·  9 arrêts · Occitanie Hôpitaux - Facultés → Mosson
+== A « ND de Sablassou-Pl. de l'Europe »
+  sens 0 → Notre-Dame de Sablassou : 8 arrêts, Place de l'Europe … ; plus long 8 (Place de l'Europe → Notre-Dame de Sablassou, 355 trajets)
+       355 trajets ·  8 arrêts · Place de l'Europe → Notre-Dame de Sablassou
+  sens 1 → Place de l'Europe : 8 arrêts, Notre-Dame de Sablassou … ; plus long 8 (Notre-Dame de Sablassou → Place de l'Europe, 359 trajets)
+       359 trajets ·  8 arrêts · Notre-Dame de Sablassou → Place de l'Europe
+== Amigo « Amigo »
+  sens 0 → Les Marestelles : 6 arrêts, Rondelet … ; plus long 6 (Rondelet → Les Marestelles, 12 trajets)
+        12 trajets ·  6 arrêts · Rondelet → Les Marestelles
+  sens 1 → Le Grand M : 39 arrêts, Industrie … ; plus long 39 (Industrie → Le Grand M, 6 trajets)
+         6 trajets · 39 arrêts · Industrie → Le Grand M
+         6 trajets · 38 arrêts · Mas de Grille → Le Grand M
