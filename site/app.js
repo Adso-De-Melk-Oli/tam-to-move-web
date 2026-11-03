@@ -1,6 +1,6 @@
 // TaM to Move – page web. Favoris sauvegardés dans le navigateur (localStorage), rien n'est envoyé ailleurs.
-import * as E from "./engine.js?v=4";
-import { RELAIS } from "./config.js?v=4";
+import * as E from "./engine.js?v=5";
+import { RELAIS } from "./config.js?v=5";
 
 const MAX = 10;
 const KEY = "ttm.favoris";

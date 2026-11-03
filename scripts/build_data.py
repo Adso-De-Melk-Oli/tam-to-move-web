@@ -135,18 +135,27 @@ def build(z, out):
                     tl.append([trips[t2][1], t2, times])
             tl.sort(key=lambda x: min(t for t in x[2] if t is not None))
             ddata[str(d)] = {"stops": stops, "trips": tl}
-        # Lignes en boucle (tram 4) : deux sens vers le même terminus → girouette du GTFS, sinon « · via … »
+        # Lignes en boucle (tram 4) : deux sens vers le même terminus → girouette propre au sens
+        # (« Garcia Lorca A » → « Sens A »), puis le premier arrêt desservi : « Sens A · via … »
         if len(dirs) == 2 and norm(dirs[0]["headsign"]) == norm(dirs[1]["headsign"]):
-            g = [pretty(girouette.get(rep.get((rid, x["dir"])), "")) if girouette.get(rep.get((rid, x["dir"]))) else "" for x in dirs]
-            if all(g) and norm(g[0]) != norm(g[1]):
-                for x, h in zip(dirs, g):
-                    x["headsign"] = h
-            else:
-                for x in dirs:
-                    start = x["stops"][0]["name"] if x["stops"] else ""
-                    via = next((st2["name"] for st2 in x["stops"][1:] if norm(st2["name"]) not in (norm(start), norm(x["headsign"]))), None)
-                    if via:
-                        x["headsign"] = x["headsign"] + " · via " + via
+            sets = []
+            for x in dirs:
+                cnt = defaultdict(int)
+                for t2, (r2, _, d2) in trips.items():
+                    if r2 == rid and d2 == x["dir"] and girouette.get(t2):
+                        cnt[girouette[t2]] += 1
+                sets.append([h for h, _ in sorted(cnt.items(), key=lambda kv: -kv[1])])
+            propres = [next((h for h in sets[i] if norm(h) not in {norm(o) for o in sets[1 - i]}), None) for i in (0, 1)]
+            for i, x in enumerate(dirs):
+                base = x["headsign"]
+                label = base
+                if all(propres):
+                    h = propres[i].strip()
+                    suf = h[len(base):].strip() if norm(h).startswith(norm(base)) else ""
+                    label = "Sens " + suf.upper() if 1 <= len(suf) <= 3 else pretty(h)
+                start = x["stops"][0]["name"] if x["stops"] else ""
+                via = next((st2["name"] for st2 in x["stops"][1:] if norm(st2["name"]) not in (norm(start), norm(base))), None)
+                x["headsign"] = label + (" · via " + via if via else "")
         if dirs:
             lignes.append({"routeId": rid, "short": m["short"], "long": m["long"], "color": m["color"],
                            "textColor": m["text"], "type": m["type"], "directions": dirs, "file": safe(rid)})
