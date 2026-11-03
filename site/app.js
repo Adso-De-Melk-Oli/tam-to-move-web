@@ -1,6 +1,6 @@
 // TaM to Move – page web. Favoris sauvegardés dans le navigateur (localStorage), rien n'est envoyé ailleurs.
-import * as E from "./engine.js?v=6";
-import { RELAIS } from "./config.js?v=6";
+import * as E from "./engine.js?v=7";
+import { RELAIS } from "./config.js?v=7";
 
 const MAX = 10;
 const KEY = "ttm.favoris";
@@ -191,7 +191,7 @@ function viewSuivi(key) {
   const now = S.now, b = E.board(S.routes[f.routeId], live() ? S.rt : null, now, f);
   const ps = b.passages.filter(p => !p.canceled), first = ps[0];
   const l = ligne(f.routeId), d = l && l.directions.find(x => x.dir === f.dir);
-  const t = d ? E.track(f, d.stops, live() ? S.feed : null, b.passages, now, 4, 5, 2, live() ? S.vehicles : []) : null;
+  const t = d ? E.track(f, d.stops, live() ? S.feed : null, b.passages, now, 4, 4, 1, live() ? S.vehicles : []) : null;
   const tram = f.type === 0;
   let h = `<div class="nav"><a href="#/">‹ Accueil</a></div>
     <div class="row">${pill(f)}<h1 class="t2 ell">${short(f.stopName)}</h1></div>
@@ -271,10 +271,6 @@ function render() {
   // Ne pas reconstruire la page pendant une saisie (garde le clavier ouvert)
   if (document.activeElement && document.activeElement.id === "q" && p[0] === "ajout" && !p[1]) return;
   app.innerHTML = h;
-  // Suivi : parcours entier, on se place une fois sur ton arrêt
-  const me = app.querySelector(".tr.me");
-  if (me && S.scrolledTo !== location.hash) { S.scrolledTo = location.hash; me.scrollIntoView({ block: "center" }); }
-  if (!me && !location.hash.startsWith("#/suivi")) S.scrolledTo = null;
 }
 
 function toast(msg) {

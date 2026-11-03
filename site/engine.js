@@ -340,13 +340,12 @@ function dist(a1, o1, a2, o2) {
 
 const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 
-export function track(q, dirStops, feed, passages, now, count = 4, before = 5, after = 2, vehicles = []) {
+export function track(q, dirStops, feed, passages, now, count = 4, before = 4, after = 1, vehicles = []) {
   // Ton arrêt par son identifiant, sinon par son nom (autre quai du même arrêt)
   let me = dirStops.findIndex(s => s.id === q.stopId);
   if (me < 0) { const n = norm(q.stopName || ""); me = dirStops.findIndex(s => norm(s.name) === n); }
   if (me < 0) return null;
-  // Parcours entier (la page se place sur ton arrêt)
-  const from = 0, to = dirStops.length - 1;
+  const from = Math.max(0, me - before), to = Math.min(dirStops.length - 1, me + after);
   const indexOf = new Map(); dirStops.forEach((s, i) => { if (!indexOf.has(s.id)) indexOf.set(s.id, i); });
   const byTrip = new Map((feed ? feed.trips : []).filter(t => t.tripId).map(t => [t.tripId, t]));
   const vehByTrip = new Map(vehicles.filter(v => v.tripId && now - (v.ts || now) < 300).map(v => [v.tripId, v]));
