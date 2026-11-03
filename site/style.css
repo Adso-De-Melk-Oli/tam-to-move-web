@@ -104,3 +104,8 @@ h1.t2{font-size:30px;letter-spacing:-.6px;line-height:36px}
 .qr svg{width:220px;height:220px;background:#fff;border-radius:8px}
 .bus .b{position:relative}
 .bus .gps{position:absolute;right:-5px;top:-5px;width:13px;height:13px;border-radius:7px;background:var(--live);border:2px solid #fff}
+
+/* Terminus sous ton arrêt : rail en pointillés, repère carré */
+.tr.term .rail::before { background: repeating-linear-gradient(var(--lcf) 0 5px, transparent 5px 10px); }
+.tr.term .rail::after { border-radius: 3px; border-color: var(--lcf); }
+.tr.term .n { color: var(--secondary, #8e8e93); }

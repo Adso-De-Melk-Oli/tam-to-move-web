@@ -191,7 +191,7 @@ function viewSuivi(key) {
   const now = S.now, b = E.board(S.routes[f.routeId], live() ? S.rt : null, now, f);
   const ps = b.passages.filter(p => !p.canceled), first = ps[0];
   const l = ligne(f.routeId), d = l && l.directions.find(x => x.dir === f.dir);
-  const t = d ? E.track(f, d.stops, live() ? S.feed : null, b.passages, now, 4, 4, 1, live() ? S.vehicles : []) : null;
+  const t = d ? E.track(f, d.stops, live() ? S.feed : null, b.passages, now, 4, 4, 0, live() ? S.vehicles : []) : null;
   const tram = f.type === 0;
   let h = `<div class="nav"><a href="#/">‹ Accueil</a></div>
     <div class="row">${pill(f)}<h1 class="t2 ell">${short(f.stopName)}</h1></div>
@@ -208,6 +208,11 @@ function viewSuivi(key) {
   }
   h += `<div class="track">${t.stops.map((s, i) => `<div class="tr ${i === 0 ? "first" : ""} ${i === t.stops.length - 1 ? "last" : ""} ${i === t.myIndex ? "me" : ""} ${i > t.myIndex ? "after" : ""}">
     <span class="rail"></span><span class="n ell">${nice(s.name)}</span>${i === t.myIndex ? `<span class="me-tag">TON ARRÊT</span>` : ""}</div>`).join("")}
+    ${(() => { // Terminus de la ligne, sous ton arrêt
+      const term = d.terminus || d.headsign.split(" · ")[0];
+      const reste = Math.max(0, d.stops.findIndex(x => x.id === t.stops[t.myIndex].id) >= 0 ? d.stops.length - 1 - d.stops.findIndex(x => x.id === t.stops[t.myIndex].id) : 0);
+      return `<div class="tr after last term"><span class="rail"></span><span class="grow"><span class="n ell">${nice(term)}</span><br><span class="dest" style="font-size:12px">Terminus${reste ? ` · ${reste} arrêt${reste > 1 ? "s" : ""} entre le tien et le terminus` : ""}</span></span></div>`;
+    })()}
     ${t.buses.map(v => `<div class="bus ${v.estimated ? "est" : ""}" style="top:${Math.max(2, 6 + 54 * (v.index - 1) + 27 + 54 * v.frac - 15)}px"><span class="b" style="background:${lc}">${glyph(tram)}${v.gps ? `<i class="gps"></i>` : ""}</span>
       <span class="eta ${v.realtime ? "" : "th"}">${v.realtime ? "" : "≈ "}${E.wait(v.eta, now)}</span></div>`).join("")}</div></div>
     <div class="gfoot">${!t.buses.length && !t.far.length ? "Aucun passage prévu pour l'instant." : "Chaque pastille sur le tracé est un véhicule en route, avec son temps d'arrivée à ton arrêt. Point vert : position GPS réelle. Pastille pâle : position estimée d'après l'horaire. « À venir » : pas encore sur ce tronçon. Mise à jour toutes les 30 s."}</div>`;
