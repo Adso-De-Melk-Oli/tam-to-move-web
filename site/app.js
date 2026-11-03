@@ -1,6 +1,6 @@
 // TaM to Move – page web. Favoris sauvegardés dans le navigateur (localStorage), rien n'est envoyé ailleurs.
-import * as E from "./engine.js?v=8";
-import { RELAIS } from "./config.js?v=8";
+import * as E from "./engine.js?v=9";
+import { RELAIS } from "./config.js?v=9";
 
 const MAX = 10;
 const KEY = "ttm.favoris";
@@ -44,7 +44,8 @@ async function loadCatalog() {
 const ligne = id => S.catalog && S.catalog.lignes.find(l => l.routeId === id);
 
 async function loadRoutes() {
-  const need = [...new Set(S.favoris.map(f => f.routeId))].filter(id => !S.routes[id]);
+  const arr = arriveeInfo();
+  const need = [...new Set([...S.favoris.map(f => f.routeId), ...(arr ? [arr.routeId] : [])])].filter(id => !S.routes[id]);
   await Promise.all(need.map(async id => {
     const l = ligne(id);
     try { S.routes[id] = await json(`data/r/${l ? l.file : id}.json`); } catch (e) {}
@@ -73,6 +74,11 @@ async function refresh() {
   await loadRealtime();
   S.loading = false;
   render();
+}
+
+function arriveeInfo() {
+  const p = location.hash.slice(1).split("/").filter(Boolean);
+  return p[0] === "arrivee" && p[1] ? E.decodeArrivee(p[1]) : null;
 }
 
 // ---------------------------------------------------------------- Rendu
@@ -257,6 +263,39 @@ function viewImport(payload) {
     <div class="gfoot" style="text-align:center">10 arrêts au maximum. Tes arrêts restent dans ce navigateur.</div>`;
 }
 
+// « J'arrive » : la personne qui reçoit le lien voit ce bus arriver, en direct
+function viewArrivee() {
+  const a = arriveeInfo();
+  const nav = `<div class="nav"><a href="#/">TaM to Move</a></div>`;
+  if (!a) return nav + `<div class="msg">Lien « J'arrive » illisible.</div>`;
+  const l = ligne(a.routeId), d = l && l.directions.find(x => x.dir === a.dir);
+  if (!S.catalog) return nav + `<div class="msg">Chargement du réseau TaM…</div>`;
+  if (!d) return nav + `<div class="msg">Ligne introuvable.</div>`;
+  const stops = [...d.stops, ...(d.terminusId ? [{ id: d.terminusId, name: d.terminus }] : [])];
+  const now = S.now, r = E.arrivee(a, S.routes[a.routeId], live() ? S.feed : null, live() ? S.vehicles : [], stops, now);
+  const tram = ["1", "2", "3", "4", "5"].includes(String(l.short).trim());
+  const veh = tram ? "tram" : String(l.short).trim().toUpperCase() === "A" ? "bustram" : "bus";
+  const qui = a.name ? esc(a.name) : "Ton contact";
+  const dest = nice(r.dest || "son arrêt");
+  let h = nav + `<div class="row" style="gap:10px;margin:6px 0 4px">${pill(l)}<h1 style="margin:0">${qui} arrive</h1></div>
+    <div class="sub">en ${veh} ${esc(l.short)} → ${dest}</div>`;
+  if (r.arrived) {
+    h += `<div class="card"><div style="font-size:30px;font-weight:700">Arrivé ✓</div><div class="dest">${qui} est arrivé${a.name ? "" : "(e)"} à ${dest}${r.eta ? ` vers ${E.hour(r.eta)}` : ""}. Le suivi est terminé.</div></div>`;
+  } else {
+    h += `<div class="card"><div class="dest">Arrivée prévue à ${dest}</div>
+      <div style="font-size:34px;font-weight:700;letter-spacing:-.8px" class="${r.realtime ? "" : "th"}">${r.eta ? (r.realtime ? "" : "≈ ") + E.hour(r.eta) : "—"}</div>
+      <div class="dest">${r.eta ? E.wait(r.eta, now) : ""}${r.restants != null ? ` · ${r.restants === 0 ? "prochain arrêt" : `${r.restants} arrêt${r.restants > 1 ? "s" : ""} avant`}` : ""}</div>
+      <div class="dest" style="margin-top:6px"><span class="dot ${r.realtime ? "live" : ""}" style="${r.realtime ? "" : "background:var(--warn)"}"></span>${r.realtime ? (r.gps ? "Position GPS en direct" : "En direct") : "Heure prévue (direct TaM indisponible)"}${S.rtAt ? ` · mis à jour à ${E.hour(S.rtAt)}` : ""}</div></div>`;
+    if (r.prochains.length) {
+      h += `<div class="card" style="padding:6px 0;--lc:#${esc(l.color)};--lcf:color-mix(in srgb,#${esc(l.color)} 30%,transparent)"><div class="track">${r.prochains.slice(-6).map((n, i, all) =>
+        `<div class="tr ${i === 0 ? "first" : ""} ${i === all.length - 1 ? "last me" : ""}"><span class="rail"></span><span class="n ell">${nice(n)}</span>${i === all.length - 1 ? `<span class="me-tag">DESCENTE</span>` : ""}</div>`).join("")}</div></div>`;
+    }
+  }
+  h += `<div class="gfoot">Seul le ${veh} est suivi, grâce aux données publiques de la TaM : la position de ${qui} n'est pas partagée. Mise à jour toutes les 30 s.</div>
+    ${isAndroid ? `<a class="btn s" href="${APK}">Installer TaM to Move sur Android</a>` : ""}`;
+  return h;
+}
+
 let lastQuery = "";
 function render() {
   S.now = Date.now() / 1000;
@@ -272,6 +311,7 @@ function render() {
   else if (p[0] === "suivi") h = viewSuivi(p.slice(1).join("/"));
   else if (p[0] === "partage") h = viewPartage();
   else if (p[0] === "import") h = viewImport(p[1] || "");
+  else if (p[0] === "arrivee") h = viewArrivee();
   else h = viewHome();
   const app = $("#app");
   // Ne pas reconstruire la page pendant une saisie (garde le clavier ouvert)
@@ -329,7 +369,7 @@ document.addEventListener("input", e => {
   const el = e.target, pos = el.selectionStart;
   el.blur(); render(); const n = $("#q"); n.focus(); n.setSelectionRange(pos, pos);
 });
-addEventListener("hashchange", () => { render(); scrollTo(0, 0); });
+addEventListener("hashchange", () => { render(); scrollTo(0, 0); if (arriveeInfo()) refresh(); });
 document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 
 // ---------------------------------------------------------------- Démarrage

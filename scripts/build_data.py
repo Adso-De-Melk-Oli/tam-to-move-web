@@ -124,7 +124,7 @@ def build(z, out):
                 if s not in stops:
                     stops.append(s)
             idx = {s: i for i, s in enumerate(stops)}
-            dirs.append({"dir": d, "headsign": pretty(names.get(seq[-1], "?")), "terminus": pretty(names.get(seq[-1], "?")),
+            dirs.append({"dir": d, "headsign": pretty(names.get(seq[-1], "?")), "terminus": pretty(names.get(seq[-1], "?")), "terminusId": seq[-1],
                          "stops": [dict({"id": s, "name": pretty(names.get(s, s))},
                                     **({"lat": pos[s][0], "lon": pos[s][1]} if s in pos else {})) for s in stops]})
             tl = []

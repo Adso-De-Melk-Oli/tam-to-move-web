@@ -88,4 +88,16 @@ test("partage", () => {
   // Même encodage que l'appli Android (Base64 URL sans remplissage)
   assert.equal(p, Buffer.from("6~0~6236~1,10~1~1020~0").toString("base64url"));
 });
+test("j'arrive", () => {
+  const feed = E.parseFeed(readFileSync(dir + "tripupdate.pb"));
+  const d = cat.lignes[0].directions.find(x => x.dir === 0);
+  const stops = [...d.stops, { id: "EUR", name: "Euromédecine" }];
+  const a = { routeId: "6-B", dir: 0, stopId: "VIA1", tripId: "T1", name: "Olivier", eta: null };
+  assert.deepEqual(E.decodeArrivee(E.encodeArrivee(a)), { ...a, eta: null });
+  const r = E.arrivee(a, rd, feed, [], stops, now);
+  assert.ok(r.realtime); assert.ok(!r.arrived); assert.ok(r.eta > now + 420);
+  assert.equal(r.dest, "Pierre Viala"); assert.ok(r.restants >= 0);
+  // Même lien que l'appli Android
+  assert.equal(E.encodeArrivee({ ...a, eta: 123 }), Buffer.from("6-B~0~VIA1~T1~Olivier~123").toString("base64url"));
+});
 console.log(`${n} tests réussis`);

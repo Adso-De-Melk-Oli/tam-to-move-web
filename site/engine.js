@@ -422,3 +422,51 @@ export function decodeShare(payload) {
       .map(([routeId, dir, stopId, star]) => ({ routeId, dir: +dir, stopId, star: star === "1" }));
   } catch (e) { return []; }
 }
+
+/** « J'arrive » : ligne~sens~arrêt de descente~trajet~prénom~heure prévue (lien envoyé depuis l'appli). */
+export function decodeArrivee(payload) {
+  try {
+    const [routeId, dir, stopId, tripId, name, eta] = b64d(payload).split("~");
+    if (!routeId || !tripId || !/^\d+$/.test(dir)) return null;
+    return { routeId, dir: +dir, stopId, tripId, name: name || "", eta: eta ? +eta : null };
+  } catch (e) { return null; }
+}
+export const encodeArrivee = a => b64e([a.routeId, a.dir, a.stopId, a.tripId, a.name || "", a.eta || ""].join("~"));
+
+/**
+ * Où en est le bus d'un lien « J'arrive » : heure d'arrivée à l'arrêt de descente (temps réel si possible),
+ * arrêts restants, position GPS. stops = parcours du sens, terminus compris.
+ */
+export function arrivee(a, rd, feed, vehicles, stops, now) {
+  const quai = { key: quaiKey(a.routeId, a.dir, a.stopId), routeId: a.routeId, dir: a.dir, stopId: a.stopId };
+  const tu = feed ? feed.trips.find(t => t.tripId === a.tripId) : null;
+  let eta = null, realtime = false, passe = false;
+  if (feed && rd) {
+    const rt = predictions({ [a.routeId]: rd }, [quai], feed, now);
+    const p = (rt.preds[quai.key] || []).find(x => x.trip === a.tripId && !x.canceled);
+    if (p) { eta = p.time; realtime = true; }
+    passe = rt.passed.has(a.tripId + "|" + quai.key);
+  }
+  if (eta == null && tu) {
+    const su = tu.stops.find(s => s.stopId === a.stopId && !s.skipped);
+    const t = su && (su.arrTime ?? su.depTime);
+    if (t != null) { eta = t; realtime = true; }
+    else if (a.eta) {
+      const d = [...tu.stops].reverse().find(s => (s.arrDelay ?? s.depDelay) != null);
+      if (d) { eta = a.eta + (d.arrDelay ?? d.depDelay); realtime = true; }
+    }
+  }
+  if (eta == null && a.eta) eta = a.eta;
+  const di = stops.findIndex(s => s.id === a.stopId);
+  let next = -1;
+  if (tu) {
+    const nx = tu.stops.find(s => { const t = s.arrTime ?? s.depTime; return t != null && t >= now - 20; });
+    if (nx) next = stops.findIndex(s => s.id === nx.stopId);
+  }
+  const v = (vehicles || []).find(x => x.tripId === a.tripId);
+  if (v && v.stopId) { const i = stops.findIndex(s => s.id === v.stopId); if (i >= 0) next = i; }
+  const arrived = passe || (eta != null && eta < now - 60) || (di >= 0 && next > di) || (tu == null && feed != null && eta != null && eta < now + 60);
+  const restants = di >= 0 && next >= 0 && next <= di ? di - next : null;
+  return { eta, realtime: realtime && !!tu, arrived, next, restants, gps: !!v, dest: di >= 0 ? stops[di].name : null,
+    prochains: di >= 0 && next >= 0 && next <= di ? stops.slice(next, di + 1).map(s => s.name) : [] };
+}
