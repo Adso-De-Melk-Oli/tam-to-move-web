@@ -1,6 +1,6 @@
 // TaM to Move – page web. Favoris sauvegardés dans le navigateur (localStorage), rien n'est envoyé ailleurs.
-import * as E from "./engine.js?v=11";
-import { RELAIS } from "./config.js?v=11";
+import * as E from "./engine.js?v=12";
+import { RELAIS } from "./config.js?v=12";
 
 const MAX = 10;
 const KEY = "ttm.favoris";
@@ -38,10 +38,26 @@ async function loadCatalog() {
 }
 
 const ligne = id => S.catalog && S.catalog.lignes.find(l => l.routeId === id);
+const norm = s => String(s || "").normalize("NFD").replace(/\p{M}+/gu, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+/** Toutes les lignes et sens qui partent d'un arrêt (même nom) */
+function stationQuais(name) {
+  if (!S.catalog) return [];
+  const n = norm(name), out = [];
+  for (const l of S.catalog.lignes) for (const d of l.directions) for (const st of d.stops) {
+    if (norm(st.name) !== n) continue;
+    const key = E.quaiKey(l.routeId, d.dir, st.id);
+    if (!out.some(q => q.key === key)) out.push({ key, routeId: l.routeId, short: l.short, color: l.color, textColor: l.textColor,
+      type: l.type, dir: d.dir, stopId: st.id, stopName: st.name, headsign: d.headsign });
+  }
+  return out.sort((a, b) => (parseInt(a.short) || 999) - (parseInt(b.short) || 999) || String(a.short).localeCompare(b.short) || a.headsign.localeCompare(b.headsign));
+}
+const stationName = () => { const p = location.hash.slice(1).split("/").filter(Boolean); return p[0] === "arret" && p[1] ? decodeURIComponent(p[1]) : null; };
 
 async function loadRoutes() {
   const arr = arriveeInfo();
-  const need = [...new Set([...S.favoris.map(f => f.routeId), ...(arr ? [arr.routeId] : [])])].filter(id => !S.routes[id]);
+  const st = stationName();
+  const need = [...new Set([...S.favoris.map(f => f.routeId), ...(arr ? [arr.routeId] : []), ...(st ? stationQuais(st).map(q => q.routeId) : [])])].filter(id => !S.routes[id]);
   await Promise.all(need.map(async id => {
     const l = ligne(id);
     try { S.routes[id] = await json(`data/r/${l ? l.file : id}.json`); } catch (e) {}
@@ -118,7 +134,15 @@ function viewHome() {
       <div class="dest" style="margin:8px 0 16px">Ajoute les arrêts que tu prends souvent : leurs prochains bus et trams s'affichent ici, en direct. Jusqu'à 10 arrêts, sur la ligne et dans le sens de ton choix. Ils restent dans ce navigateur.</div>
       <a class="btn" href="#/ajout">Ajouter ton premier arrêt</a></div>`;
   }
+  // Cartes regroupées par arrêt ; le titre ouvre toutes les lignes de l'arrêt, la carte ouvre le suivi
+  const groupes = [];
   for (const b of boards()) {
+    const g = groupes.find(x => norm(x.name) === norm(b.quai.stopName));
+    if (g) g.items.push(b); else groupes.push({ name: b.quai.stopName, items: [b] });
+  }
+  for (const g of groupes) {
+  h += `<a class="sthead" href="#/arret/${encodeURIComponent(g.name)}"><span class="sn">${nice(g.name)}</span><span class="all">Toutes les lignes ›</span></a>`;
+  for (const b of g.items) {
     const f = b.quai, first = b.passages.find(p => !p.canceled);
     const chip = { DIRECT: ["Direct", "var(--live)"], THEORIQUE: ["Théorique", "var(--warn)"], NUIT: ["Nuit", "var(--sec)"] }[b.etat];
     let body;
@@ -131,9 +155,10 @@ function viewHome() {
       ? `<div class="x"><b>Supprimé</b><span>${E.hour(p.time)}</span></div>`
       : `<div><b class="${p.realtime ? "" : "th"}">${p.realtime ? "" : "≈ "}${E.wait(p.time, now)}</b><span>${E.hourWithDay(p.time, now)}</span></div>`).join("")}</div>` : "";
     h += `<a class="card" href="#/suivi/${encodeURIComponent(f.key)}" style="color:inherit">
-      <div class="row">${pill(f)}<div class="grow"><div class="stop ell">${nice(f.stopName)}</div><div class="dest ell">→ ${nice(f.headsign)}</div></div>
+      <div class="row">${pill(f)}<div class="grow"><div class="stop ell">→ ${nice(f.headsign)}</div></div>
       ${chip ? `<span class="chip" style="color:${chip[1]};background:color-mix(in srgb,${chip[1]} 14%,transparent)">${chip[0]}</span>` : ""}</div>
       ${body}${next}</a>`;
+  }
   }
   h += `<a class="card link" href="https://www.tam-voyages.com/fr" target="_blank" rel="noopener"><div><b>Site officiel TaM</b><span class="dest">tam-voyages.com · plans, tarifs, infos trafic</span></div><span style="color:var(--accent);font-size:20px">↗</span></a>
     <a class="card link" href="${APK}"><div><b>Appli Android</b><span class="dest">${isAndroid ? "widget, alertes « Pars maintenant » et dernier bus" : "à télécharger depuis un téléphone Android"}</span></div><span style="color:var(--accent);font-size:20px">↓</span></a>
@@ -166,6 +191,15 @@ function viewAjout(q) {
   const n = s => s.normalize("NFD").replace(/\p{M}+/gu, "").toLowerCase();
   const k = n((q || "").trim());
   const ls = S.catalog.lignes.filter(l => !k || n(l.short + " " + l.long).includes(k) || l.directions.some(d => d.stops.some(s => n(s.name).includes(k))));
+  if (k.length >= 2) {
+    const vus = new Set(), arrets = [];
+    for (const l of S.catalog.lignes) for (const d of l.directions) for (const st of d.stops) {
+      const nn = norm(st.name);
+      if (!vus.has(nn) && n(st.name).includes(k)) { vus.add(nn); arrets.push(st.name); }
+    }
+    arrets.sort((a, b) => (n(a).startsWith(k) ? 0 : 1) - (n(b).startsWith(k) ? 0 : 1));
+    if (arrets.length) h += `<div class="stitle">ARRÊTS</div><div class="group">${arrets.slice(0, 8).map(a => `<a class="item" href="#/arret/${encodeURIComponent(a)}" style="color:inherit">📍<div class="grow ell" style="font-size:15px">${nice(a)}</div><span class="dest">toutes les lignes ›</span></a>`).join("")}</div><div class="stitle">LIGNES</div>`;
+  }
   h += `<div class="group">${ls.map(l => `<a class="item" href="#/ajout/${encodeURIComponent(l.routeId)}" style="color:inherit">
     <span style="width:44px">${pill(l)}</span><div class="grow"><div class="ell" style="font-size:15px;font-weight:500">${nice(l.long || l.directions.map(d => d.headsign).join(" ↔ "))}</div>
     <div class="dest" style="font-size:12px">${l.type === 0 ? "Tramway" : "Bus"}</div></div><span class="chev">›</span></a>`).join("") || `<div class="msg">Aucun résultat</div>`}</div>`;
@@ -201,6 +235,7 @@ function viewSuivi(key) {
   let h = `<div class="nav"><a href="#/">‹ Accueil</a></div>
     <div class="row">${pill(f)}<h1 class="t2 ell">${short(f.stopName)}</h1></div>
     <div class="sub"><span class="dot ${live() ? "live" : ""}" style="${live() ? "" : "background:var(--warn)"}"></span>→ ${short(f.headsign)} · ${live() ? `positions ${t && t.buses.some(b => b.gps) ? "GPS " : ""}en direct · ${E.hour(S.rtAt)}` : "positions indisponibles"}</div>
+    <a class="chipbtn" href="#/arret/${encodeURIComponent(f.stopName)}">🚏 Toutes les lignes à ${short(f.stopName)} ›</a>
     <div class="card row" style="padding:14px 16px"><div class="grow">
       <div style="font-size:30px;font-weight:700;letter-spacing:-.7px" class="${first && first.realtime ? "" : "th"}">${first ? (first.realtime ? "" : "≈ ") + E.wait(first.time, now) : "—"}</div>
       ${first ? `<div class="dest">prochain ${tram ? "tram" : "bus"} · ${E.hourWithDay(first.time, now)}</div>` : ""}</div>
@@ -262,6 +297,26 @@ function viewImport(payload) {
     <div class="gfoot" style="text-align:center">10 arrêts au maximum. Tes arrêts restent dans ce navigateur.</div>`;
 }
 
+// Écran par arrêt : toutes les lignes et sens, ＋ pour suivre
+function viewStation(name) {
+  const back = `<div class="nav"><a href="#/">‹ Accueil</a></div>`;
+  if (!S.catalog) return back + `<div class="msg">Réseau TaM en cours de chargement…</div>`;
+  const qs = stationQuais(name), now = S.now;
+  const rt = live() && S.feed ? E.predictions(S.routes, qs, S.feed, now) : null;
+  const suivis = new Set(S.favoris.map(f => f.key));
+  let h = back + `<h1>${nice(name)}</h1><div class="sub"><span class="dot ${rt ? "live" : ""}" style="${rt ? "" : "background:var(--warn)"}"></span>${qs.length} ligne${qs.length > 1 ? "s" : ""} et sens · ${rt ? "en direct" : "horaires théoriques"}</div>`;
+  if (!qs.length) return h + `<div class="msg">Aucune ligne trouvée pour cet arrêt.</div>`;
+  h += `<div class="group">${qs.map(q => {
+    const b = E.board(S.routes[q.routeId], rt, now, q, 3);
+    const ps = b.passages.filter(p => !p.canceled).slice(0, 3);
+    const txt = !S.routes[q.routeId] ? "Chargement…" : ps.length ? ps.map(p => (p.realtime ? "" : "≈ ") + E.wait(p.time, now)).join(" · ") : "Pas de passage prévu";
+    const act = suivis.has(q.key) ? `<a class="dest" href="#/suivi/${encodeURIComponent(q.key)}">✓ suivi ›</a>`
+      : `<button class="round plusb" data-addq="${esc(q.key)}" aria-label="Suivre">+</button>`;
+    return `<div class="item"><span style="width:44px">${pill(q)}</span><div class="grow"><div class="ell" style="font-weight:600;font-size:15px">→ ${nice(q.headsign)}</div><div class="dest ell" style="font-size:13px">${txt}</div></div>${act}</div>`;
+  }).join("")}</div><div class="gfoot">Touche ＋ pour suivre une ligne dans ce sens : elle rejoint ton accueil (10 arrêts au maximum). « ≈ » : heure théorique.</div>`;
+  return h;
+}
+
 // « J'arrive » : la personne qui reçoit le lien voit ce bus arriver, en direct
 function viewArrivee() {
   const a = arriveeInfo();
@@ -311,6 +366,7 @@ function render() {
   else if (p[0] === "partage") h = viewPartage();
   else if (p[0] === "import") h = viewImport(p[1] || "");
   else if (p[0] === "arrivee") h = viewArrivee();
+  else if (p[0] === "arret" && p[1]) h = viewStation(p.slice(1).join("/"));
   else h = viewHome();
   const app = $("#app");
   // Ne pas reconstruire la page pendant une saisie (garde le clavier ouvert)
@@ -326,7 +382,7 @@ function toast(msg) {
 // ---------------------------------------------------------------- Actions
 
 document.addEventListener("click", async e => {
-  const el = e.target.closest("[data-del],[data-mv],[data-add],[data-copy],[data-share],[data-import]");
+  const el = e.target.closest("[data-del],[data-mv],[data-add],[data-addq],[data-copy],[data-share],[data-import]");
   if (!el) return;
   if (el.dataset.copy != null) {
     try { await navigator.clipboard.writeText(shareLink()); toast("Lien copié"); } catch (x) { prompt("Copie ce lien :", shareLink()); }
@@ -343,6 +399,13 @@ document.addEventListener("click", async e => {
     S.favoris = [...base, ...add].slice(0, MAX); save();
     toast(replace ? `Liste remplacée : ${S.favoris.length} arrêts` : `${Math.min(add.length, MAX - base.length)} arrêt(s) ajouté(s)`);
     pendingImport = null; location.hash = "#/"; refresh();
+    return;
+  }
+  if (el.dataset.addq != null) {
+    const q = stationQuais(stationName() || "").find(x => x.key === el.dataset.addq);
+    if (!q || S.favoris.some(f => f.key === q.key)) return;
+    if (S.favoris.length >= MAX) return toast("10 arrêts maximum : retires-en un d'abord.");
+    S.favoris.push(q); save(); toast(`Ajouté : ${q.short} → ${q.headsign.split(" · ")[0]}`); refresh();
     return;
   }
   if (el.dataset.del != null) {
@@ -368,7 +431,7 @@ document.addEventListener("input", e => {
   const el = e.target, pos = el.selectionStart;
   el.blur(); render(); const n = $("#q"); n.focus(); n.setSelectionRange(pos, pos);
 });
-addEventListener("hashchange", () => { render(); scrollTo(0, 0); if (arriveeInfo()) refresh(); });
+addEventListener("hashchange", () => { render(); scrollTo(0, 0); if (arriveeInfo() || stationName()) refresh(); });
 document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 
 // ---------------------------------------------------------------- Démarrage

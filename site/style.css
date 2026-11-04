@@ -111,3 +111,11 @@ h1.t2{font-size:30px;letter-spacing:-.6px;line-height:36px}
 .tr.term .n { color: var(--secondary, #8e8e93); }
 
 .subtitle{color:var(--sec);font-size:15px;font-weight:500;margin:-2px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Accueil rangé par arrêt */
+.sthead{display:flex;align-items:center;gap:8px;padding:10px 6px 8px;color:inherit;text-decoration:none}
+.sthead .sn{flex:1;font-size:19px;font-weight:700;letter-spacing:-.3px;color:var(--label)}
+.sthead .all{font-size:13px;font-weight:600;color:var(--accent);white-space:nowrap}
+.chipbtn{display:inline-block;margin:2px 0 14px;padding:8px 12px;border-radius:12px;background:var(--card);color:var(--accent);font-size:14px;font-weight:600;text-decoration:none}
+.stitle{font-size:13px;font-weight:600;letter-spacing:.4px;color:var(--sec);margin:14px 16px 6px}
+.round.plusb{background:var(--accent);color:#fff;font-size:20px}
