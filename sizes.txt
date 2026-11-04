@@ -1,0 +1,9 @@
+gbfs 200 1064
+system_information 200 827
+station_status 200 25628
+station_information 200 19601
+vehicle_types 200 1204
+free_bike_status 200 52816
+system_pricing_plans 200 72
+geofencing_zones 200 736
+gbfs_versions 200 344
