@@ -322,7 +322,7 @@ export function alerts(quais, feed, now) {
     const active = !a.periods.length || a.periods.some(([s, e]) => (e == null || e >= now) && (s == null || s <= now + 86400));
     if ((direct || network) && active && (a.header || a.text)) {
       const p = a.periods.find(([, e]) => e == null || e >= now);
-      out.push({ id: a.id || a.header, title: a.header || "Info trafic", text: a.text, end: p ? p[1] : null });
+      out.push({ id: a.id || a.header, title: a.header || "Info trafic", text: a.text, end: p ? p[1] : null, routes: a.routes, stops: a.stops });
     }
   }
   return out.filter((a, i) => out.findIndex(b => b.id === a.id) === i);
@@ -469,4 +469,36 @@ export function arrivee(a, rd, feed, vehicles, stops, now) {
   const restants = di >= 0 && next >= 0 && next <= di ? di - next : null;
   return { eta, realtime: realtime && !!tu, arrived, next, restants, gps: !!v, dest: di >= 0 ? stops[di].name : null,
     prochains: di >= 0 && next >= 0 && next <= di ? stops.slice(next, di + 1).map(s => s.name) : [] };
+}
+
+// ---------------------------------------------------------------- Perturbations regroupées
+
+const CODE = /^[\s\-–—*•]*([A-Z0-9ÉÈÀ]{1,10}(\/[A-Z0-9ÉÈÀ]{0,12}){1,4})\s+/;
+const nrm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+/** Titre lisible : sans les codes internes TaM (« -MANIF/TRAM/4 PAS DE SERVICE » → « Pas de service »). */
+export function titreAlerte(a) {
+  const brut = String(a.title || "").trim();
+  let t = brut.replace(/^[\-–—*•\s]+/, "");
+  const m = brut.match(CODE);
+  if (m) t = brut.slice(m[0].length).trim();
+  t = t.replace(/\s+/g, " ").trim();
+  if (t && t === t.toUpperCase()) t = t.charAt(0) + t.slice(1).toLowerCase();
+  const mots = t.split(" ").filter(Boolean);
+  if (mots.length >= 2 && mots.some(w => w.length >= 6)) return t;
+  const phrase = String(a.text || "").trim().split(". ")[0].replace(/\.$/, "").trim();
+  if (!phrase) return t || "Info trafic";
+  return phrase.length <= 90 ? phrase : phrase.slice(0, 87).replace(/\s+\S*$/, "") + "…";
+}
+
+/** Doublons regroupés (même titre et même texte sur plusieurs lignes). */
+export function regrouperAlertes(list) {
+  const m = new Map();
+  for (const a of list) {
+    const titre = titreAlerte(a), k = nrm(titre + " " + a.text);
+    const g = m.get(k);
+    if (g) { g.nombre++; for (const r of a.routes || []) if (!g.routes.includes(r)) g.routes.push(r); for (const s of a.stops || []) if (!g.stops.includes(s)) g.stops.push(s); }
+    else m.set(k, { alert: a, titre, nombre: 1, routes: [...(a.routes || [])], stops: [...(a.stops || [])] });
+  }
+  return [...m.values()];
 }

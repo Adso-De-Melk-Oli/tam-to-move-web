@@ -127,3 +127,14 @@ h1.t2{font-size:30px;letter-spacing:-.6px;line-height:36px}
 
 .card.addhome{display:flex;align-items:center;gap:12px;color:var(--accent);font-size:17px;text-decoration:none}
 .card.addhome .plus{width:26px;height:26px;border-radius:50%;background:var(--live,#34C759);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+/* Perturbations : bandeau résumé et panneau */
+.alert.resume{display:flex;align-items:center;gap:12px;text-align:left}
+.alert p.fin{color:var(--sec);font-size:12px;margin-top:4px}
+.alert .chev{margin-left:auto}
+.voile{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40}
+.panneau{position:fixed;left:0;right:0;bottom:0;max-height:82vh;overflow:auto;background:var(--bg);border-radius:22px 22px 0 0;padding:10px 16px 28px;z-index:41;max-width:640px;margin:0 auto}
+.panneau .grab{width:40px;height:5px;border-radius:3px;background:var(--ter);margin:0 auto 12px}
+.panneau h2{font-size:22px}
+.lien{background:none;border:0;color:var(--accent);font-size:17px;font-weight:600;cursor:pointer}
+.nb{font-size:12px;color:var(--sec);background:var(--fill);border-radius:8px;padding:1px 6px;font-weight:400}

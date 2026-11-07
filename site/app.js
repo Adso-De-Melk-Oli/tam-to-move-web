@@ -1,6 +1,6 @@
 // TaM to Move – page web. Favoris sauvegardés dans le navigateur (localStorage), rien n'est envoyé ailleurs.
-import * as E from "./engine.js?v=14";
-import { RELAIS } from "./config.js?v=14";
+import * as E from "./engine.js?v=15";
+import { RELAIS } from "./config.js?v=15";
 
 const MAX = 10;
 const KEY = "ttm.favoris";
@@ -125,9 +125,17 @@ function viewHome() {
   const now = S.now;
   let h = `<div class="nav">${S.favoris.length ? `<a href="#/partage">Partager</a>` : "<span></span>"}<a class="action" href="#/arrets">Modifier</a></div>
     <h1>TaM to Move</h1><div class="subtitle">Bus et tram en direct · Métropole de Montpellier</div><div class="sub">${status()}</div>`;
-  for (const a of S.alerts) {
-    h += `<button class="alert" onclick="this.classList.toggle('open')"><div class="i">!</div><div><b>${esc(a.title)}</b>${a.text ? `<p>${esc(a.text)}</p>` : ""}</div></button>`;
+  // Perturbations : doublons regroupés ; à partir de 2, un bandeau résumé qui ouvre le panneau
+  const perturb = E.regrouperAlertes(S.alerts);
+  if (perturb.length === 1) {
+    const g = perturb[0];
+    h += `<button class="alert" data-pan="1"><div class="i">!</div><div><b>${esc(g.titre)}</b>${g.alert.text && !g.alert.text.startsWith(g.titre.replace(/…$/, "")) ? `<p>${esc(g.alert.text)}</p>` : ""}${finAlerte(g.alert.end) ? `<p class="fin">${finAlerte(g.alert.end)}</p>` : ""}</div></button>`;
+  } else if (perturb.length > 1) {
+    const mien = perturb.filter(g => alerteMienne(g)), lignes = [...new Set(mien.flatMap(g => g.routes))].map(ligne).filter(Boolean);
+    h += `<button class="alert resume" data-pan="1"><div class="i">!</div><div class="grow"><b>${perturb.length} perturbations en cours</b>
+      <p>${lignes.slice(0, 5).map(l => pill(l)).join(" ")} ${[mien.length ? "sur tes lignes" : "", perturb.length - mien.length ? `+${perturb.length - mien.length} réseau` : ""].filter(Boolean).join(" · ")}</p></div><span class="chev">›</span></button>`;
   }
+  if (S.panneau) h += panneauAlertes(perturb);
   if (!S.favoris.length) {
     h += `<div class="card" style="text-align:center;padding:26px 20px"><div style="font-size:40px">🚏</div>
       <div style="font-weight:600;font-size:17px;margin-top:6px">Bienvenue sur TaM to Move</div>
@@ -341,6 +349,30 @@ function viewPres() {
   return h;
 }
 
+function finAlerte(end) {
+  if (!end) return "";
+  const d = new Date(end * 1000), auj = new Date(S.now * 1000);
+  const h = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
+  const jour = x => x.toLocaleDateString("fr-FR", { timeZone: "Europe/Paris" });
+  if (jour(d) === jour(auj)) return `Jusqu'à ${h} aujourd'hui`;
+  const dem = new Date((S.now + 86400) * 1000);
+  if (jour(d) === jour(dem)) return `Jusqu'à demain ${h}`;
+  return "Jusqu'au " + d.toLocaleDateString("fr-FR", { day: "numeric", month: "short", timeZone: "Europe/Paris" }) + " à " + h;
+}
+const alerteMienne = g => S.favoris.some(f => g.routes.includes(f.routeId) || g.stops.includes(f.stopId));
+function panneauAlertes(groupes) {
+  const part = [["TES LIGNES", groupes.filter(alerteMienne)], ["RÉSEAU", groupes.filter(g => !alerteMienne(g))]];
+  return `<div class="voile" data-pan="0"></div><div class="panneau"><div class="grab"></div><div class="row" style="margin-bottom:6px"><h2 class="grow" style="margin:0">Perturbations</h2><button class="lien" data-pan="0">OK</button></div>
+    ${part.filter(([, l]) => l.length).map(([t, l]) => `<div class="stitle">${t}</div><div class="group">${l.map(g => {
+      const ls = g.routes.map(ligne).filter(Boolean);
+      // Titre tiré du texte : on affiche le texte une seule fois
+      const tire = g.alert.text && g.alert.text.startsWith(g.titre.replace(/…$/, ""));
+      return `<div class="item" style="align-items:flex-start"><span style="width:${ls.length > 1 || !ls.length ? 66 : 44}px;flex:none">${ls.length ? ls.slice(0, 2).map(x => pill(x)).join(" ") : `<span class="pill s" style="background:#8e8e93">Réseau</span>`}</span>
+        <div class="grow"><div style="font-weight:600;font-size:15px">${esc(tire ? g.alert.text : g.titre)}${g.nombre > 1 ? ` <span class="nb">×${g.nombre} lignes</span>` : ""}</div>${g.alert.text && !tire ? `<div class="dest" style="font-size:13px;margin-top:3px">${esc(g.alert.text)}</div>` : ""}${finAlerte(g.alert.end) ? `<div class="dest" style="font-size:12px;margin-top:4px">${finAlerte(g.alert.end)}</div>` : ""}</div></div>`;
+    }).join("")}</div>`).join("")}
+    <div class="gfoot">Les doublons sont regroupés. Source : infos trafic TaM en direct.</div></div>`;
+}
+
 // Écran par arrêt : toutes les lignes et sens, ＋ pour suivre
 function viewStation(name) {
   const back = `<div class="nav"><a href="#/">‹ Accueil</a></div>`;
@@ -427,6 +459,8 @@ function toast(msg) {
 // ---------------------------------------------------------------- Actions
 
 document.addEventListener("click", async e => {
+  const pan = e.target.closest("[data-pan]");
+  if (pan) { S.panneau = pan.dataset.pan === "1"; render(); return; }
   const el = e.target.closest("[data-del],[data-mv],[data-add],[data-addq],[data-copy],[data-share],[data-import]");
   if (!el) return;
   if (el.dataset.copy != null) {
