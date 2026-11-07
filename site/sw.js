@@ -1,6 +1,6 @@
 // Hors ligne : l'interface et les horaires déjà consultés restent disponibles.
-const CACHE = "ttm-v12";
-const SHELL = ["./", "index.html", "style.css?v=12", "app.js?v=12", "engine.js?v=12", "config.js?v=12", "manifest.webmanifest", "icon-192.png", "vendor/qrcode.js?v=12",
+const CACHE = "ttm-v13";
+const SHELL = ["./", "index.html", "style.css?v=13", "app.js?v=13", "engine.js?v=13", "config.js?v=13", "manifest.webmanifest", "icon-192.png", "vendor/qrcode.js?v=13",
   "fonts/inter_regular.otf", "fonts/inter_medium.otf", "fonts/inter_semibold.otf", "fonts/inter_bold.otf"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); self.skipWaiting(); });
 self.addEventListener("activate", e => {

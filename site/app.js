@@ -1,6 +1,6 @@
 // TaM to Move – page web. Favoris sauvegardés dans le navigateur (localStorage), rien n'est envoyé ailleurs.
-import * as E from "./engine.js?v=12";
-import { RELAIS } from "./config.js?v=12";
+import * as E from "./engine.js?v=13";
+import { RELAIS } from "./config.js?v=13";
 
 const MAX = 10;
 const KEY = "ttm.favoris";
@@ -186,7 +186,8 @@ function viewArrets() {
 
 function viewAjout(q) {
   let h = `<div class="nav"><a href="#/arrets">‹ Mes arrêts</a></div><h1>Choisir une ligne</h1><div class="sub">Étape 1 sur 3</div>
-    <input class="search" id="q" placeholder="Rechercher une ligne ou un arrêt" value="${esc(q || "")}" autocomplete="off">`;
+    <input class="search" id="q" placeholder="Rechercher une ligne ou un arrêt" value="${esc(q || "")}" autocomplete="off">
+    <a class="nearbtn" href="#/pres"><span class="nic">📍</span><span><b>Arrêts près de moi</b><br><span class="dest">Les plus proches, du plus près au plus loin</span></span></a>`;
   if (!S.catalog) return h + `<div class="msg">Réseau TaM en cours de chargement…</div>`;
   const n = s => s.normalize("NFD").replace(/\p{M}+/gu, "").toLowerCase();
   const k = n((q || "").trim());
@@ -297,6 +298,47 @@ function viewImport(payload) {
     <div class="gfoot" style="text-align:center">10 arrêts au maximum. Tes arrêts restent dans ce navigateur.</div>`;
 }
 
+// « Arrêts près de moi » : position du navigateur, arrêts triés par distance (rien n'est envoyé en ligne)
+function demanderPosition() {
+  if (S.posAsk) return;
+  if (!navigator.geolocation) { S.posErr = "Ce navigateur ne donne pas la position."; return render(); }
+  S.posAsk = true;
+  navigator.geolocation.getCurrentPosition(
+    p => { S.pos = { lat: p.coords.latitude, lon: p.coords.longitude, acc: Math.round(p.coords.accuracy), at: Date.now() }; S.posErr = null; S.posAsk = false; render(); },
+    e => { S.posErr = e.code === 1 ? "Position refusée : autorise-la pour ce site dans ton navigateur." : "Position indisponible pour l'instant."; S.posAsk = false; render(); },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+}
+function distM(a, b, c, d) {
+  const x = (d - b) * Math.PI / 180 * Math.cos((a + c) / 2 * Math.PI / 180), y = (c - a) * Math.PI / 180;
+  return Math.sqrt(x * x + y * y) * 6371000;
+}
+function viewPres() {
+  const back = `<div class="nav"><a href="#/ajout">‹ Ajouter un arrêt</a></div><h1>Près de moi</h1>`;
+  if (!S.pos || Date.now() - S.pos.at > 120000) demanderPosition();
+  if (S.posErr && !S.pos) return back + `<div class="msg">${esc(S.posErr)}</div>`;
+  if (!S.pos) return back + `<div class="sub">Recherche de ta position…</div>`;
+  if (!S.catalog) return back + `<div class="msg">Réseau TaM en cours de chargement…</div>`;
+  const par = new Map();
+  for (const l of S.catalog.lignes) for (const d of l.directions) for (const st of d.stops) {
+    if (!st.lat) continue;
+    const m = distM(S.pos.lat, S.pos.lon, st.lat, st.lon);
+    if (m > 1500) continue;
+    const k = norm(st.name), a = par.get(k) || { name: st.name, d: m, lignes: new Map() };
+    a.d = Math.min(a.d, m); a.lignes.set(l.routeId, l); par.set(k, a);
+  }
+  const liste = [...par.values()].sort((a, b) => a.d - b.d).slice(0, 8);
+  const approx = S.pos.acc > 150;
+  let h = back + `<div class="sub"><span class="dot ${approx ? "" : "live"}" style="${approx ? "background:var(--warn)" : ""}"></span>Position ${approx ? "approximative" : "exacte"} · précision ${S.pos.acc} m</div>`;
+  if (!liste.length) return h + `<div class="msg">Aucun arrêt TaM à moins de 1,5 km.</div>`;
+  h += `<div class="group">${liste.map(a => {
+    const m = Math.round(a.d / 10) * 10;
+    const ls = [...a.lignes.values()].sort((x, y) => (parseInt(x.short) || 999) - (parseInt(y.short) || 999) || String(x.short).localeCompare(y.short));
+    return `<a class="item" href="#/arret/${encodeURIComponent(a.name)}" style="color:inherit"><div class="grow"><div class="ell" style="font-weight:600;font-size:15px;margin-bottom:5px">${nice(a.name)}</div><div>${ls.slice(0, 7).map(l => pill(l)).join(" ")}${ls.length > 7 ? ` <span class="dest">+${ls.length - 7}</span>` : ""}</div></div>
+      <div style="text-align:right;flex:none"><div style="font-weight:600">${m < 1000 ? (approx ? "≈ " : "") + m + " m" : "≈ " + (m / 1000).toFixed(1).replace(".", ",") + " km"}</div><div class="dest" style="font-size:12px">${Math.max(1, Math.round(a.d * 1.3 / 75))} min</div></div><span class="chev">›</span></a>`;
+  }).join("")}</div><div class="gfoot">Distance à vol d'oiseau, temps à pied estimé. Touche un arrêt pour voir toutes ses lignes et en ajouter une avec ＋. Ta position reste dans ton navigateur.</div>`;
+  return h;
+}
+
 // Écran par arrêt : toutes les lignes et sens, ＋ pour suivre
 function viewStation(name) {
   const back = `<div class="nav"><a href="#/">‹ Accueil</a></div>`;
@@ -362,6 +404,7 @@ function render() {
     else if (p[2] == null) h = viewSens(l);
     else { const d = l.directions.find(x => x.dir === +p[2]); h = d ? viewArret(l, d) : viewSens(l); }
   } else if (p[0] === "ajout") h = viewAjout(lastQuery);
+  else if (p[0] === "pres") h = viewPres();
   else if (p[0] === "suivi") h = viewSuivi(p.slice(1).join("/"));
   else if (p[0] === "partage") h = viewPartage();
   else if (p[0] === "import") h = viewImport(p[1] || "");

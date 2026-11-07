@@ -119,3 +119,8 @@ h1.t2{font-size:30px;letter-spacing:-.6px;line-height:36px}
 .chipbtn{display:inline-block;margin:2px 0 14px;padding:8px 12px;border-radius:12px;background:var(--card);color:var(--accent);font-size:14px;font-weight:600;text-decoration:none}
 .stitle{font-size:13px;font-weight:600;letter-spacing:.4px;color:var(--sec);margin:14px 16px 6px}
 .round.plusb{background:var(--accent);color:#fff;font-size:20px}
+
+/* Arrêts près de moi */
+.nearbtn{display:flex;align-items:center;gap:12px;margin:12px 0 18px;padding:12px 14px;border-radius:14px;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--accent);color:inherit;text-decoration:none}
+.nearbtn b{color:var(--accent);font-size:15px}
+.nearbtn .nic{width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
