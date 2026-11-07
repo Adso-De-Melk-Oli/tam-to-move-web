@@ -1,6 +1,6 @@
 // TaM to Move – page web. Favoris sauvegardés dans le navigateur (localStorage), rien n'est envoyé ailleurs.
-import * as E from "./engine.js?v=13";
-import { RELAIS } from "./config.js?v=13";
+import * as E from "./engine.js?v=14";
+import { RELAIS } from "./config.js?v=14";
 
 const MAX = 10;
 const KEY = "ttm.favoris";
@@ -160,6 +160,8 @@ function viewHome() {
       ${body}${next}</a>`;
   }
   }
+  // Ajouter un arrêt sans passer par « Modifier »
+  if (S.favoris.length && S.favoris.length < MAX) h += `<a class="card addhome" href="#/ajout"><span class="plus">+</span><span class="grow">Ajouter un arrêt</span><span class="dest">${S.favoris.length}/${MAX}</span></a>`;
   h += `<a class="card link" href="https://www.tam-voyages.com/fr" target="_blank" rel="noopener"><div><b>Site officiel TaM</b><span class="dest">tam-voyages.com · plans, tarifs, infos trafic</span></div><span style="color:var(--accent);font-size:20px">↗</span></a>
     <a class="card link" href="${APK}"><div><b>Appli Android</b><span class="dest">${isAndroid ? "widget, alertes « Pars maintenant » et dernier bus" : "à télécharger depuis un téléphone Android"}</span></div><span style="color:var(--accent);font-size:20px">↓</span></a>
     <div class="foot">≈ heure approximative, d'après les horaires théoriques. Tes arrêts restent dans ce navigateur.</div>
@@ -185,7 +187,7 @@ function viewArrets() {
 }
 
 function viewAjout(q) {
-  let h = `<div class="nav"><a href="#/arrets">‹ Mes arrêts</a></div><h1>Choisir une ligne</h1><div class="sub">Étape 1 sur 3</div>
+  let h = `<div class="nav"><a href="${S.ajoutFrom || "#/arrets"}">‹ ${S.ajoutFrom === "#/" ? "Accueil" : "Mes arrêts"}</a></div><h1>Choisir une ligne</h1><div class="sub">Étape 1 sur 3</div>
     <input class="search" id="q" placeholder="Rechercher une ligne ou un arrêt" value="${esc(q || "")}" autocomplete="off">
     <a class="nearbtn" href="#/pres"><span class="nic">📍</span><span><b>Arrêts près de moi</b><br><span class="dest">Les plus proches, du plus près au plus loin</span></span></a>`;
   if (!S.catalog) return h + `<div class="msg">Réseau TaM en cours de chargement…</div>`;
@@ -464,7 +466,7 @@ document.addEventListener("click", async e => {
     S.favoris.push({ key: E.quaiKey(l.routeId, d.dir, s.id), routeId: l.routeId, short: l.short, color: l.color, textColor: l.textColor,
       type: l.type, dir: d.dir, stopId: s.id, stopName: s.name, headsign: d.headsign });
     save(); toast(`Ajouté : ${l.short} · ${s.name}`);
-    location.hash = "#/arrets";
+    location.hash = S.ajoutFrom || "#/arrets";
     refresh();
   }
 });
@@ -474,7 +476,10 @@ document.addEventListener("input", e => {
   const el = e.target, pos = el.selectionStart;
   el.blur(); render(); const n = $("#q"); n.focus(); n.setSelectionRange(pos, pos);
 });
-addEventListener("hashchange", () => { render(); scrollTo(0, 0); if (arriveeInfo() || stationName()) refresh(); });
+addEventListener("hashchange", e => {
+  // D'où vient-on pour ajouter un arrêt ? (accueil ou « Mes arrêts ») : on y revient ensuite
+  const de = (e.oldURL.split("#")[1] || "/"), vers = location.hash.slice(1);
+  if (vers === "/ajout" && (de === "/" || de === "/arrets")) S.ajoutFrom = "#" + de; render(); scrollTo(0, 0); if (arriveeInfo() || stationName()) refresh(); });
 document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 
 // ---------------------------------------------------------------- Démarrage
