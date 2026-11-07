@@ -80,7 +80,10 @@ def build(z, out):
     # publiées par la TaM), sinon sur toute la période ; à égalité le plus long, puis le plus petit identifiant.
     from datetime import datetime
     from zoneinfo import ZoneInfo
-    today = datetime.now(ZoneInfo("Europe/Paris")).date()
+    # TTM_DATE=AAAA-MM-JJ fixe le jour (tests reproductibles) ; sinon aujourd'hui à Montpellier
+    import os
+    from datetime import date
+    today = date.fromisoformat(os.environ["TTM_DATE"]) if os.environ.get("TTM_DATE") else datetime.now(ZoneInfo("Europe/Paris")).date()
     tstr = today.strftime("%Y%m%d")
     dow = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"][today.weekday()]
     active = set()

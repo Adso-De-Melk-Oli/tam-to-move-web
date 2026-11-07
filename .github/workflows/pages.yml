@@ -29,7 +29,8 @@ jobs:
         with: { node-version: "22" }
       - name: Tests du moteur
         run: |
-          python3 scripts/build_data.py test/data test/gtfs.zip
+          # Jeu de test daté du lundi 2 novembre 2026 : on fige le jour pour des tests reproductibles
+          TTM_DATE=2026-11-02 python3 scripts/build_data.py test/data test/gtfs.zip
           TZ=Europe/Paris node test/engine.test.mjs
       - name: Horaires TaM
         run: python3 scripts/build_data.py site/data
