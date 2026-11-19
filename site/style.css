@@ -138,3 +138,16 @@ h1.t2{font-size:30px;letter-spacing:-.6px;line-height:36px}
 .panneau h2{font-size:22px}
 .lien{background:none;border:0;color:var(--accent);font-size:17px;font-weight:600;cursor:pointer}
 .nb{font-size:12px;color:var(--sec);background:var(--fill);border-radius:8px;padding:1px 6px;font-weight:400}
+
+/* « Offre-moi un café » */
+.cafe{display:flex;align-items:center;gap:12px;margin:22px 8px 8px;padding:11px 14px;border-radius:16px;background:var(--card,#fff);border:1px solid rgba(230,65,142,.22);color:inherit;text-decoration:none}
+.cafe .tasse{width:36px;height:36px;flex:none;color:var(--label,#1C1C1E)}
+.cafe .vapeur path{stroke:#E6418E;opacity:0}
+.cafe-t{flex:1;display:flex;flex-direction:column}.cafe-t b{font-weight:600;font-size:15px}.cafe-t small{font-size:12px;opacity:.6}
+.cafe-c{color:#E6418E;font-size:22px;font-weight:700}
+@media (prefers-reduced-motion:no-preference){
+  .cafe .vapeur path{animation:vapeur 3s linear infinite}
+  .cafe .vapeur path:nth-child(2){animation-delay:-1s}.cafe .vapeur path:nth-child(3){animation-delay:-2s}
+}
+@media (prefers-reduced-motion:reduce){.cafe .vapeur path{opacity:.7}}
+@keyframes vapeur{0%{opacity:.85;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}

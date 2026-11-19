@@ -1,6 +1,6 @@
 // TaM to Move – page web. Favoris sauvegardés dans le navigateur (localStorage), rien n'est envoyé ailleurs.
-import * as E from "./engine.js?v=15";
-import { RELAIS } from "./config.js?v=15";
+import * as E from "./engine.js?v=16";
+import { RELAIS } from "./config.js?v=16";
 
 const MAX = 10;
 const KEY = "ttm.favoris";
@@ -394,6 +394,18 @@ function viewStation(name) {
 }
 
 // « J'arrive » : la personne qui reçoit le lien voit ce bus arriver, en direct
+// « Offre-moi un café » : tasse dont la vapeur monte doucement, ouvre Ko-fi
+const KOFI = "https://ko-fi.com/adsodemelk";
+function cafe() {
+  return `<a class="cafe" href="${KOFI}" target="_blank" rel="noopener">
+    <svg class="tasse" viewBox="0 0 48 48" aria-hidden="true"><g class="vapeur" fill="none" stroke-linecap="round" stroke-width="2.2">
+      <path d="M17 18 q-3 -4 0 -8 q3 -4 0 -7"/><path d="M24 18 q-3 -4 0 -8 q3 -4 0 -7"/><path d="M31 18 q-3 -4 0 -8 q3 -4 0 -7"/></g>
+      <path d="M10 21 h28 v9 a10 10 0 0 1 -10 10 h-8 a10 10 0 0 1 -10 -10z" fill="currentColor"/>
+      <path d="M38 24 h3 a4.5 4.5 0 0 1 0 9 h-4" fill="none" stroke="currentColor" stroke-width="3"/>
+      <rect x="7" y="42" width="34" height="3" rx="1.5" fill="currentColor" opacity=".25"/></svg>
+    <span class="cafe-t"><b>Offre-moi un café</b><small>TaM to Move est gratuit et sans pub</small></span><span class="cafe-c">›</span></a>`;
+}
+
 function viewArrivee() {
   const a = arriveeInfo();
   const nav = `<div class="nav"><a href="#/">TaM to Move</a></div>`;
@@ -422,7 +434,8 @@ function viewArrivee() {
     }
   }
   h += `<div class="gfoot">Seul le ${veh} est suivi, grâce aux données publiques de la TaM : la position de ${qui} n'est pas partagée. Mise à jour toutes les 30 s.</div>
-    ${isAndroid ? `<a class="btn s" href="${APK}">Installer TaM to Move sur Android</a>` : ""}`;
+    ${isAndroid ? `<a class="btn s" href="${APK}">Installer TaM to Move sur Android</a>` : ""}
+    ${cafe()}`;
   return h;
 }
 
