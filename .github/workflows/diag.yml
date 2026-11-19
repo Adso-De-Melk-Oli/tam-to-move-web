@@ -16,9 +16,9 @@ jobs:
           curl -sS -o /dev/null -D /tmp/h0 https://gtfsproxy.e-tam.fr/COMMON/GTFS.zip
           E=$(grep -i '^etag' /tmp/h0 | cut -d' ' -f2- | tr -d '\r'); M=$(grep -i '^last-modified' /tmp/h0 | cut -d' ' -f2- | tr -d '\r')
           echo "== conditionnel ETag=[$E] LM=[$M]"
+          for u in GTFS.zip TripUpdate.pb; do curl -sS -o /dev/null -H "Accept-Encoding: gzip" -w "gzip $u : code=%{http_code} octets=%{size_download}\n" "https://gtfsproxy.e-tam.fr/COMMON/$u"; done
           curl -sS -o /dev/null -w "code=%{http_code} octets=%{size_download}\n" ${E:+-H "If-None-Match: $E"} ${M:+-H "If-Modified-Since: $M"} https://gtfsproxy.e-tam.fr/COMMON/GTFS.zip
-      - if: false
-        run: |
+      - run: |
           curl -sSL -o /tmp/g.zip https://gtfsproxy.e-tam.fr/COMMON/GTFS.zip
           python3 scripts/build_data.py /tmp/out /tmp/g.zip > /dev/null
           python3 scripts/diag.py /tmp/g.zip /tmp/out/catalog.json > /tmp/diag.txt 2>&1 || true
