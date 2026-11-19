@@ -7,7 +7,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
+      - name: En-têtes du GTFS (téléchargement conditionnel ?)
+        run: |
+          for u in GTFS.zip TripUpdate.pb VehiclePosition.pb Alert.pb; do
+            echo "== $u"; curl -sS -o /tmp/f -D /tmp/h "https://gtfsproxy.e-tam.fr/COMMON/$u"; grep -iE "^(HTTP|etag|last-modified|content-length|cache-control|content-encoding)" /tmp/h; echo "octets: $(stat -c %s /tmp/f)"
+          done
+          E=$(grep -i '^etag' /tmp/h0 2>/dev/null | cut -d' ' -f2- | tr -d '\r')
+          curl -sS -o /dev/null -D /tmp/h0 https://gtfsproxy.e-tam.fr/COMMON/GTFS.zip
+          E=$(grep -i '^etag' /tmp/h0 | cut -d' ' -f2- | tr -d '\r'); M=$(grep -i '^last-modified' /tmp/h0 | cut -d' ' -f2- | tr -d '\r')
+          echo "== conditionnel ETag=[$E] LM=[$M]"
+          curl -sS -o /dev/null -w "code=%{http_code} octets=%{size_download}\n" ${E:+-H "If-None-Match: $E"} ${M:+-H "If-Modified-Since: $M"} https://gtfsproxy.e-tam.fr/COMMON/GTFS.zip
+      - if: false
+        run: |
           curl -sSL -o /tmp/g.zip https://gtfsproxy.e-tam.fr/COMMON/GTFS.zip
           python3 scripts/build_data.py /tmp/out /tmp/g.zip > /dev/null
           python3 scripts/diag.py /tmp/g.zip /tmp/out/catalog.json > /tmp/diag.txt 2>&1 || true
