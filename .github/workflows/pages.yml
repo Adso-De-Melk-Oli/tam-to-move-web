@@ -45,14 +45,16 @@ jobs:
         run: |
           gh api repos/${{ github.repository }}/releases/latest > /tmp/rel.json || echo '{}' > /tmp/rel.json
           python3 - <<'PY'
-          import json
+          import json, os
           d = json.load(open("/tmp/rel.json"))
+          # Interrupteur du relais Cloudflare : créer le fichier « relais-coupe » à la racine le coupe pour toutes les applis
+          relais = not os.path.exists("relais-coupe")
           tag = d.get("tag_name", "")
           v = int(tag.rsplit(".", 1)[-1]) if tag and tag.rsplit(".", 1)[-1].isdigit() else 0
           url = next((a["browser_download_url"] for a in d.get("assets", []) if a["name"] == "Tam-to-Move.apk"), "")
-          json.dump({"version": v, "tag": tag, "url": url, "notes": (d.get("body") or "")[:600]},
+          json.dump({"version": v, "tag": tag, "url": url, "notes": (d.get("body") or "")[:600], "relais": relais},
                     open("site/version.json", "w"), ensure_ascii=False)
-          print("version.json :", v, url)
+          print("version.json :", v, url, "relais :", relais)
           PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
