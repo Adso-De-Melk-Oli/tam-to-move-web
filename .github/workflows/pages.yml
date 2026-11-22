@@ -34,6 +34,8 @@ jobs:
           TZ=Europe/Paris node test/engine.test.mjs
       - name: Horaires TaM
         run: python3 scripts/build_data.py site/data
+      - name: Horaires allégés pour l'appli Android
+        run: python3 scripts/gtfs_leger.py site/gtfs-leger.zip
       - name: Vérifier le relais
         continue-on-error: true
         run: |
