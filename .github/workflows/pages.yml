@@ -49,12 +49,17 @@ jobs:
           d = json.load(open("/tmp/rel.json"))
           # Interrupteur du relais Cloudflare : créer le fichier « relais-coupe » à la racine le coupe pour toutes les applis
           relais = not os.path.exists("relais-coupe")
+          # Adresse du relais (fichier « relais-url » à la racine ; absent = relais Cloudflare d'origine), lue par l'appli 1.0.109 et +
+          relais_url = open("relais-url").read().strip() if os.path.exists("relais-url") else ""
+          # Limites (5 arrêts, 2 sur le widget) : fichier « limites-actives » à la racine ; absent = pas de limite
+          limites = os.path.exists("limites-actives")
           tag = d.get("tag_name", "")
           v = int(tag.rsplit(".", 1)[-1]) if tag and tag.rsplit(".", 1)[-1].isdigit() else 0
           url = next((a["browser_download_url"] for a in d.get("assets", []) if a["name"] == "Tam-to-Move.apk"), "")
-          json.dump({"version": v, "tag": tag, "url": url, "notes": (d.get("body") or "")[:600], "relais": relais},
+          json.dump({"version": v, "tag": tag, "url": url, "notes": (d.get("body") or "")[:600], "relais": relais,
+                     **({"relaisUrl": relais_url} if relais_url else {}), "limites": limites},
                     open("site/version.json", "w"), ensure_ascii=False)
-          print("version.json :", v, url, "relais :", relais)
+          print("version.json :", v, url, "relais :", relais, relais_url or "(Cloudflare)", "limites :", limites)
           PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
